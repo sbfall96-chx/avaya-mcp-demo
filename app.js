@@ -14,7 +14,8 @@ const state = {
     postgresql_db: true,
     salesforce_crm: true,
     sharepoint_kb: true,
-    axp_stream: true
+    axp_stream: true,
+    acm_server: true
   },
   govPolicies: {
     hipaaMasking: false,
@@ -244,7 +245,8 @@ const serverSwitches = {
   postgresql_db: document.getElementById('server-switch-pg'),
   salesforce_crm: document.getElementById('server-switch-crm'),
   sharepoint_kb: document.getElementById('server-switch-kb'),
-  axp_stream: document.getElementById('server-switch-axp')
+  axp_stream: document.getElementById('server-switch-axp'),
+  acm_server: document.getElementById('server-switch-acm')
 };
 
 // ----------------------------------------------------
@@ -338,6 +340,193 @@ function maskNamesInText(text) {
   });
   
   return maskedText;
+}
+
+// ----------------------------------------------------
+// ACM Telemetry State & Helpers
+// ----------------------------------------------------
+const acmTelemetryData = {
+  labels: Array.from({ length: 10 }, (_, i) => `${10 - i}s ago`),
+  jitter: Array.from({ length: 10 }, () => 2.0 + Math.random() * 3.0),
+  loss: Array.from({ length: 10 }, () => 0.01 + Math.random() * 0.03),
+  mos: Array.from({ length: 10 }, () => (4.3 + Math.random() * 0.15).toFixed(1))
+};
+
+let acmChart = null;
+let isAcmSpiked = false;
+let acmSpikeDecayCount = 0;
+
+function initAcmTelemetryChart() {
+  const ctx = document.getElementById('acm-telemetry-chart');
+  if (!ctx) return;
+
+  acmChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: acmTelemetryData.labels,
+      datasets: [
+        {
+          label: 'Jitter (ms)',
+          data: acmTelemetryData.jitter,
+          borderColor: '#00f0ff',
+          backgroundColor: 'rgba(0, 240, 255, 0.05)',
+          borderWidth: 2,
+          pointRadius: 1,
+          tension: 0.3,
+          yAxisID: 'y'
+        },
+        {
+          label: 'Packet Loss (%)',
+          data: acmTelemetryData.loss,
+          borderColor: '#DA291C',
+          backgroundColor: 'rgba(218, 41, 28, 0.05)',
+          borderWidth: 1.5,
+          pointRadius: 1,
+          tension: 0.3,
+          yAxisID: 'y1'
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { color: '#9ca3af', font: { size: 7 } }
+        },
+        y: {
+          position: 'left',
+          grid: { color: 'rgba(255, 255, 255, 0.03)' },
+          ticks: { color: '#00f0ff', font: { size: 7 } },
+          min: 0,
+          max: 200
+        },
+        y1: {
+          position: 'right',
+          grid: { display: false },
+          ticks: { color: '#DA291C', font: { size: 7 } },
+          min: 0,
+          max: 5
+        }
+      },
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          labels: {
+            boxWidth: 8,
+            color: '#9ca3af',
+            font: { size: 7 }
+          }
+        }
+      }
+    }
+  });
+}
+
+function updateAcmStatusView() {
+  const dot = document.getElementById('acm-status-dot');
+  const rate = document.getElementById('acm-telemetry-rate');
+  const trunkStatus = document.getElementById('acm-trunk-status');
+  const mosVal = document.getElementById('acm-mos-val');
+
+  if (!state.activeServers.acm_server) {
+    if (dot) {
+      dot.style.backgroundColor = 'var(--color-yellow)';
+      dot.style.animation = 'none';
+    }
+    if (rate) rate.innerText = 'Offline';
+    if (trunkStatus) {
+      trunkStatus.innerText = 'Disconnected';
+      trunkStatus.style.color = 'var(--text-muted)';
+    }
+    if (mosVal) mosVal.innerText = '0.0';
+  } else {
+    if (dot) {
+      dot.style.backgroundColor = 'var(--color-green)';
+      dot.style.animation = 'pulse 1.5s infinite';
+    }
+    if (rate) rate.innerText = 'Media server stream active';
+    if (trunkStatus) {
+      if (isAcmSpiked) {
+        trunkStatus.innerText = 'Degraded (Jitter Spike)';
+        trunkStatus.style.color = 'var(--color-avaya-red)';
+      } else {
+        trunkStatus.innerText = 'Optimal';
+        trunkStatus.style.color = 'var(--color-green)';
+      }
+    }
+    if (mosVal) {
+      const currentMos = acmTelemetryData.mos[acmTelemetryData.mos.length - 1];
+      mosVal.innerText = currentMos || '4.4';
+    }
+  }
+}
+
+function tickAcmTelemetry() {
+  if (!acmChart) return;
+
+  const now = new Date();
+  const timeStr = now.toTimeString().split(' ')[0];
+  acmTelemetryData.labels.push(timeStr);
+  acmTelemetryData.labels.shift();
+
+  let nextJitter, nextLoss, nextMos;
+
+  if (isAcmSpiked) {
+    nextJitter = 175.0 + Math.random() * 15.0;
+    nextLoss = 3.8 + Math.random() * 0.8;
+    nextMos = (1.8 + Math.random() * 0.4).toFixed(2);
+    acmSpikeDecayCount--;
+    if (acmSpikeDecayCount <= 0) {
+      isAcmSpiked = false;
+    }
+  } else {
+    nextJitter = 2.0 + Math.random() * 3.0;
+    nextLoss = 0.01 + Math.random() * 0.03;
+    nextMos = (4.3 + Math.random() * 0.15).toFixed(1);
+  }
+
+  acmTelemetryData.jitter.push(nextJitter);
+  acmTelemetryData.jitter.shift();
+  acmTelemetryData.loss.push(nextLoss);
+  acmTelemetryData.loss.shift();
+  acmTelemetryData.mos.push(nextMos);
+  acmTelemetryData.mos.shift();
+
+  acmChart.update();
+  updateAcmStatusView();
+}
+
+function flatlineAcmTelemetry() {
+  if (!acmChart) return;
+  
+  const now = new Date();
+  const timeStr = now.toTimeString().split(' ')[0];
+  acmTelemetryData.labels.push(timeStr);
+  acmTelemetryData.labels.shift();
+  acmTelemetryData.jitter.push(0);
+  acmTelemetryData.jitter.shift();
+  acmTelemetryData.loss.push(0);
+  acmTelemetryData.loss.shift();
+  acmTelemetryData.mos.push(0);
+  acmTelemetryData.mos.shift();
+
+  acmChart.update();
+  updateAcmStatusView();
+}
+
+function triggerAcmJitterSpike() {
+  isAcmSpiked = true;
+  acmSpikeDecayCount = 4; // Decay after 4 ticks
+  addAuditLog('warning', 'ACM Server', 'Media Server Telemetry Alert: SIP Trunk latency/jitter spiked to 180ms and packet loss exceeded 3.5% SLA boundary.');
+  
+  acmTelemetryData.jitter[acmTelemetryData.jitter.length - 1] = 185.0;
+  acmTelemetryData.loss[acmTelemetryData.loss.length - 1] = 4.5;
+  acmTelemetryData.mos[acmTelemetryData.mos.length - 1] = '1.8';
+  if (acmChart) acmChart.update();
+  updateAcmStatusView();
 }
 
 // Security: Mask text if HIPAA policy active
@@ -634,6 +823,14 @@ Object.keys(serverSwitches).forEach(key => {
       serverSwitches[key].classList.remove('active');
       addAuditLog('warning', 'MCP', `Revoked connection. Removed tool registries from target: ${key}`);
     }
+    
+    // Immediate UI refreshes when toggling stream servers
+    if (key === 'axp_stream') {
+      renderAxpEventsTable();
+    } else if (key === 'acm_server') {
+      updateAcmStatusView();
+    }
+    
     updateSystemState();
   });
 });
@@ -645,12 +842,12 @@ modelSelector.addEventListener('change', (e) => {
 
 function updateSystemState() {
   const activeCount = Object.values(state.activeServers).filter(Boolean).length;
-  if (activeCount === 4) {
+  if (activeCount === 5) {
     systemStatusDot.className = 'status-dot';
     systemStatusText.innerText = 'MCP Gateway: Secure';
   } else if (activeCount > 0) {
     systemStatusDot.className = 'status-dot loading';
-    systemStatusText.innerText = `MCP Gateway: ${activeCount}/4 Active`;
+    systemStatusText.innerText = `MCP Gateway: ${activeCount}/5 Active`;
   } else {
     systemStatusDot.className = 'status-dot';
     systemStatusDot.style.backgroundColor = 'var(--color-avaya-red)';
@@ -1761,6 +1958,19 @@ async function runSimulatedToolLoop(presetKey, userText) {
     }
   }
 
+  // Trigger ACM voice quality jitter spike for relevant voice/churn demos
+  if (state.activeServers.acm_server) {
+    if (presetKey === 'preset-churn-retention') {
+      triggerAcmJitterSpike();
+    } else if (userText) {
+      const queryLower = userText.toLowerCase();
+      const isTroubleshootQuery = queryLower.includes('troubleshoot') || queryLower.includes('jitter') || queryLower.includes('quality') || queryLower.includes('dropped') || queryLower.includes('issue') || queryLower.includes('policy') || queryLower.includes('sop') || queryLower.includes('ticket') || queryLower.includes('problem');
+      if (isTroubleshootQuery) {
+        triggerAcmJitterSpike();
+      }
+    }
+  }
+
   // Iterate trace steps
   for (let i = 0; i < scenario.steps.length; i++) {
     const step = scenario.steps[i];
@@ -2601,6 +2811,10 @@ window.onload = () => {
     updateSystemState();
     renderDataSiloTables();
     
+    // Initialize ACM Telemetry Chart & View
+    initAcmTelemetryChart();
+    updateAcmStatusView();
+    
     // AXP Telemetry Simulator Loop
     addAxpEvent('voice_call_ingress', 'Voice', 'Ingress voice trunk SIP connection from +1-312-555-0199 routed to AXP Region 1.');
     addAxpEvent('mcp_gateway_auth', 'System', 'Zero-Trust authorization token verified for client session. Discovery passed.');
@@ -2608,12 +2822,20 @@ window.onload = () => {
     addAxpEvent('agent_assigned', 'Chat', 'AXP CCaaS agent "Agent Sarah" assigned to support chat.');
 
     setInterval(() => {
+      // AXP Stream
       if (state.activeServers.axp_stream) {
         const randomEvt = axpEventsPool[Math.floor(Math.random() * axpEventsPool.length)];
         if (tabPanelArch.classList.contains('active')) {
           triggerArchVisualTransmission('axp_stream');
         }
         addAxpEvent(randomEvt.type, randomEvt.channel, randomEvt.details);
+      }
+      
+      // ACM Stream
+      if (state.activeServers.acm_server) {
+        tickAcmTelemetry();
+      } else {
+        flatlineAcmTelemetry();
       }
     }, 4000);
     

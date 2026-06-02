@@ -584,6 +584,38 @@
               </div>
             </div>
 
+            <!-- Silo 5: Avaya Communication Manager (ACM Media Telemetry) -->
+            <div class="silo-section" style="grid-column: 1 / -1; margin-top: 1rem;">
+              <div class="silo-title">
+                <span>Avaya Communication Manager (ACM Media Telemetry)</span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <div class="status-dot" id="acm-status-dot" style="width: 6px; height: 6px; background-color: var(--color-green); animation: pulse 1.5s infinite;"></div>
+                  <span style="font-size: 0.75rem; font-weight: normal; color: var(--text-secondary);" id="acm-telemetry-rate">Media server stream active</span>
+                </div>
+              </div>
+              <div class="silo-wrapper" style="grid-template-columns: 35% 65%;">
+                <div class="silo-form" style="padding: 10px; background: rgba(0,0,0,0.15); font-size: 0.75rem; line-height: 1.4;">
+                  <div class="silo-form-title" style="margin-bottom: 8px;">Active SIP Trunks Health</div>
+                  <table class="silo-table" style="font-size: 0.7rem;">
+                    <thead>
+                      <tr><th>Trunk ID</th><th>Status</th><th>MOS</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>Trunk ACM-1</td><td id="acm-trunk-status" style="color: var(--color-green);">Optimal</td><td id="acm-mos-val">4.4</td></tr>
+                      <tr><td>Trunk ACM-2</td><td style="color: var(--color-green);">Optimal</td><td>4.3</td></tr>
+                      <tr><td>Trunk ACM-3</td><td style="color: var(--color-green);">Optimal</td><td>4.4</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="silo-form" style="background: rgba(255,255,255,0.015); position: relative; height: 200px; display: flex; flex-direction: column;">
+                  <div class="silo-form-title">SIP Jitter & Packet Loss Analytics (Rolling Live Chart)</div>
+                  <div style="flex: 1; position: relative;">
+                    <canvas id="acm-telemetry-chart" style="width: 100%; height: 100%; max-height: 150px;"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -705,6 +737,11 @@
       <button class="server-switch active" id="server-switch-axp" data-server="axp_stream">
         <div class="switch-dot"></div>
         <span>AXP Cloud Event Stream</span>
+      </button>
+      
+      <button class="server-switch active" id="server-switch-acm" data-server="acm_server">
+        <div class="switch-dot"></div>
+        <span>Avaya Communication Manager</span>
       </button>
     </div>
   </footer>
