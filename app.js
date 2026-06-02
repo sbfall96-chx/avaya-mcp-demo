@@ -2642,15 +2642,14 @@ function switchSession(selected) {
     
     if (btnStep3) {
       btnStep3.addEventListener('click', () => {
+        // 1. Switch to audit tab immediately
         switchTab('audit');
         
-        if (step3Col) {
-          step3Col.classList.remove('active');
-          step3Col.classList.add('completed');
-        }
-        btnStep3.innerText = '✓ Done';
-        btnStep3.disabled = true;
+        // 2. Start the evaluation animation right in front of the user
+        animateGuardrailsLoading();
+        addAuditLog('info', 'Databricks', 'Initiating live hallucination and safety evaluation scans...');
         
+        // 3. Highlight the audit elements
         if (auditLogBox) {
           auditLogBox.style.outline = '2px solid var(--color-cyan)';
           auditLogBox.style.boxShadow = '0 0 20px rgba(0, 240, 255, 0.4)';
@@ -2660,10 +2659,22 @@ function switchSession(selected) {
           }, 3000);
         }
         
+        // 4. Complete the animation after 1.5 seconds so they see it shift
         setTimeout(() => {
-          addAuditLog('success', 'Demo Guide', 'Interactive Walkthrough Completed successfully! All security validations passed.');
+          animateGuardrailsComplete();
+          addAuditLog('success', 'Databricks', 'LLM trust validations completed. Hallucination risk: Low (<1%). Groundedness: 98.6%.');
           
-          const resetBtn = document.createElement('button');
+          if (step3Col) {
+            step3Col.classList.remove('active');
+            step3Col.classList.add('completed');
+          }
+          btnStep3.innerText = '✓ Done';
+          btnStep3.disabled = true;
+          
+          setTimeout(() => {
+            addAuditLog('success', 'Demo Guide', 'Interactive Walkthrough Completed successfully! All security validations passed.');
+            
+            const resetBtn = document.createElement('button');
           resetBtn.className = 'guide-action-btn';
           resetBtn.style.marginTop = '10px';
           resetBtn.innerText = 'Reset Demo Guide';
