@@ -556,6 +556,34 @@
               </div>
             </div>
 
+            <!-- Silo 4: Avaya Experience Platform (AXP Cloud Event Stream) -->
+            <div class="silo-section" style="grid-column: 1 / -1; margin-top: 1rem;">
+              <div class="silo-title">
+                <span>Avaya Experience Platform (AXP Cloud Event Stream)</span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <div class="status-dot" id="axp-status-dot" style="width: 6px; height: 6px; background-color: var(--color-green); animation: pulse 1.5s infinite;"></div>
+                  <span style="font-size: 0.75rem; font-weight: normal; color: var(--text-secondary);" id="axp-event-rate">Live stream active</span>
+                </div>
+              </div>
+              <div class="silo-wrapper" style="grid-template-columns: 100%;">
+                <div class="silo-table-container" style="max-height: 250px;">
+                  <table class="silo-table" style="font-family: var(--font-mono); font-size: 0.75rem;">
+                    <thead>
+                      <tr>
+                        <th style="width: 15%;">Timestamp</th>
+                        <th style="width: 20%;">Event Type</th>
+                        <th style="width: 15%;">Channel</th>
+                        <th style="width: 50%;">Event Details</th>
+                      </tr>
+                    </thead>
+                    <tbody id="silo-axp-tbody">
+                      <!-- Appended dynamically in real time -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -672,6 +700,11 @@
       <button class="server-switch active" id="server-switch-kb" data-server="sharepoint_kb">
         <div class="switch-dot"></div>
         <span>SharePoint Knowledge Base</span>
+      </button>
+      
+      <button class="server-switch active" id="server-switch-axp" data-server="axp_stream">
+        <div class="switch-dot"></div>
+        <span>AXP Cloud Event Stream</span>
       </button>
     </div>
   </footer>

@@ -13,7 +13,8 @@ const state = {
   activeServers: {
     postgresql_db: true,
     salesforce_crm: true,
-    sharepoint_kb: true
+    sharepoint_kb: true,
+    axp_stream: true
   },
   govPolicies: {
     hipaaMasking: false,
@@ -242,7 +243,8 @@ const kbDocViewerContent = document.getElementById('kb-doc-viewer-content');
 const serverSwitches = {
   postgresql_db: document.getElementById('server-switch-pg'),
   salesforce_crm: document.getElementById('server-switch-crm'),
-  sharepoint_kb: document.getElementById('server-switch-kb')
+  sharepoint_kb: document.getElementById('server-switch-kb'),
+  axp_stream: document.getElementById('server-switch-axp')
 };
 
 // ----------------------------------------------------
@@ -251,6 +253,72 @@ const serverSwitches = {
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// ----------------------------------------------------
+// AXP Events Pool & Helpers
+// ----------------------------------------------------
+const axpEventsPool = [
+  { type: 'voice_call_ingress', channel: 'Voice', details: 'Ingress voice trunk SIP connection from +1-312-555-0199 routed to AXP Region 1.' },
+  { type: 'chat_escalate_sms', channel: 'SMS', details: 'Webchat session #AXP-8841 escalated to SMS queue for agent callback.' },
+  { type: 'agent_assigned', channel: 'Chat', details: 'AXP CCaaS agent "Agent Sarah" assigned to support chat.' },
+  { type: 'routing_policy_check', channel: 'System', details: 'Edify Journeys validated routing rules for queue: VIP Escalation.' },
+  { type: 'sentiment_check', channel: 'Voice', details: 'Real-time NLP sentiment analysis score: 0.85 (Positive).' },
+  { type: 'sentiment_alert', channel: 'Voice', details: 'Real-time NLP sentiment score: 0.22 (Negative/Frustrated warning flagged).' },
+  { type: 'mcp_gateway_auth', channel: 'System', details: 'Zero-Trust authorization token verified for client session. Discovery passed.' },
+  { type: 'database_sync', channel: 'System', details: 'Synchronized Zendesk CRM profile metrics with Databricks Lakehouse.' },
+  { type: 'latency_check', channel: 'Voice', details: 'ACM Media Server reported 32ms round-trip latency and 0.01% packet loss.' },
+  { type: 'omni_channel_routing', channel: 'Email', details: 'Incoming support ticket #AXP-8041 queued to tier-2 routing table.' }
+];
+
+let axpEventsLog = [];
+
+function addAxpEvent(type, channel, details) {
+  const now = new Date();
+  const timeStr = now.toTimeString().split(' ')[0];
+  
+  const event = { time: timeStr, type, channel, details };
+  axpEventsLog.unshift(event);
+  if (axpEventsLog.length > 15) {
+    axpEventsLog.pop();
+  }
+
+  renderAxpEventsTable();
+}
+
+function renderAxpEventsTable() {
+  const tbody = document.getElementById('silo-axp-tbody');
+  const dot = document.getElementById('axp-status-dot');
+  const rate = document.getElementById('axp-event-rate');
+  if (!tbody) return;
+
+  if (!state.activeServers.axp_stream) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 20px;">AXP Cloud Event Stream disconnected. Toggle switch in footer to reconnect.</td></tr>`;
+    if (dot) {
+      dot.style.backgroundColor = 'var(--color-yellow)';
+      dot.style.animation = 'none';
+    }
+    if (rate) rate.innerText = 'Offline';
+    return;
+  }
+
+  if (dot) {
+    dot.style.backgroundColor = 'var(--color-green)';
+    dot.style.animation = 'pulse 1.5s infinite';
+  }
+  if (rate) rate.innerText = 'Live stream active';
+
+  tbody.innerHTML = '';
+  axpEventsLog.forEach(evt => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="color: var(--text-secondary);">${evt.time}</td>
+      <td><span class="log-badge ${evt.type.includes('alert') || evt.type.includes('threat') ? 'warning' : evt.type.includes('auth') || evt.type.includes('apply') || evt.type.includes('approve') ? 'success' : 'info'}" style="font-size: 0.65rem; padding: 2px 4px;">${evt.type}</span></td>
+      <td><span style="color: ${evt.channel === 'Voice' ? 'var(--color-avaya-red)' : evt.channel === 'Chat' ? 'var(--color-cyan)' : evt.channel === 'SMS' ? 'var(--color-green)' : 'var(--color-purple)'}">${evt.channel}</span></td>
+      <td style="color: var(--text-primary); text-align: left;">${maskText(evt.details)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
 }
 
 // Security: Mask text if HIPAA policy active
@@ -558,12 +626,12 @@ modelSelector.addEventListener('change', (e) => {
 
 function updateSystemState() {
   const activeCount = Object.values(state.activeServers).filter(Boolean).length;
-  if (activeCount === 3) {
+  if (activeCount === 4) {
     systemStatusDot.className = 'status-dot';
     systemStatusText.innerText = 'MCP Gateway: Secure';
   } else if (activeCount > 0) {
     systemStatusDot.className = 'status-dot loading';
-    systemStatusText.innerText = `MCP Gateway: ${activeCount}/3 Active`;
+    systemStatusText.innerText = `MCP Gateway: ${activeCount}/4 Active`;
   } else {
     systemStatusDot.className = 'status-dot';
     systemStatusDot.style.backgroundColor = 'var(--color-avaya-red)';
@@ -1579,6 +1647,50 @@ async function runSimulatedToolLoop(presetKey, userText) {
     if (!scenario && (queryLower.includes('volume') || queryLower.includes('channel') || queryLower.includes('dashboard') || queryLower.includes('utilization') || queryLower.includes('agent'))) {
       scenario = presetConfig['preset-agent-util'];
     }
+
+    // Scenario 6: AXP Cloud Events Telemetry Check
+    if (!scenario && (queryLower.includes('axp') || queryLower.includes('telemetry') || queryLower.includes('cloud event') || queryLower.includes('stream') || queryLower.includes('packet'))) {
+      scenario = {
+        requiredServers: ['axp_stream'],
+        steps: [
+          {
+            title: 'Query AXP Event Stream: get_live_events',
+            tag: 'axp_stream/get_live_events',
+            desc: 'Poll live events from Avaya Experience Platform (AXP) Cloud stream logs.',
+            payload: { limit: 5 },
+            execute: () => {
+              if (axpEventsLog.length === 0) return { success: true, events: [] };
+              return { success: true, events: axpEventsLog.slice(0, 5) };
+            }
+          }
+        ],
+        generate: () => {
+          if (axpEventsLog.length === 0) {
+            return `<p>I queried the **Avaya Experience Platform (AXP) Cloud Event Stream** via MCP tool <code>axp_stream/get_live_events</code> but found no recent active logs in the buffer.</p>`;
+          }
+          
+          let html = `<p>I queried tool <code>axp_stream/get_live_events</code> and fetched the latest **5 AXP Cloud events** directly from the secure gateway:</p>`;
+          html += `<div class="silo-table-container" style="max-height: 250px; border: 1px solid var(--border-color); border-radius: 6px; margin: 10px 0;">
+            <table class="silo-table" style="font-family: var(--font-mono); font-size: 0.75rem;">
+            <thead>
+              <tr><th>Timestamp</th><th>Type</th><th>Channel</th><th>Details</th></tr>
+            </thead>
+            <tbody>`;
+          
+          axpEventsLog.slice(0, 5).forEach(evt => {
+            html += `<tr>
+              <td>${evt.time}</td>
+              <td><span class="log-badge info">${evt.type}</span></td>
+              <td><span style="color: ${evt.channel === 'Voice' ? 'var(--color-avaya-red)' : evt.channel === 'Chat' ? 'var(--color-cyan)' : 'var(--color-green)'}">${evt.channel}</span></td>
+              <td>${maskText(evt.details)}</td>
+            </tr>`;
+          });
+          html += `</tbody></table></div>`;
+          return html;
+        },
+        render: () => {}
+      };
+    }
   }
 
   if (!scenario) {
@@ -1592,7 +1704,7 @@ async function runSimulatedToolLoop(presetKey, userText) {
   let offlineList = [];
   scenario.requiredServers.forEach(srv => {
     if (!state.activeServers[srv]) {
-      let name = srv === 'postgresql_db' ? 'PostgreSQL' : srv === 'salesforce_crm' ? 'Zendesk CRM' : 'SharePoint KB';
+      let name = srv === 'postgresql_db' ? 'PostgreSQL' : srv === 'salesforce_crm' ? 'Zendesk CRM' : srv === 'sharepoint_kb' ? 'SharePoint KB' : 'AXP Cloud Stream';
       offlineList.push(name);
     }
   });
@@ -1608,6 +1720,26 @@ async function runSimulatedToolLoop(presetKey, userText) {
     `;
     appendMessage('assistant', errorResponse, 'A');
     return;
+  }
+
+  // Inject AXP Events for Preset Scenarios
+  if (state.activeServers.axp_stream) {
+    if (presetKey === 'preset-wait-time') {
+      addAxpEvent('queue_spike_alert', 'System', 'AXP monitoring flagged Peak Wait-Time Spike alert in US-East queue.');
+      addAxpEvent('routing_rebalance', 'System', 'AXP Journey router diverted 15 calls to secondary queue.');
+    } else if (presetKey === 'preset-vip-escalate') {
+      addAxpEvent('vip_incoming_call', 'Voice', 'Ingress VIP call from Evelyn Carter mapped to AXP agent pool.');
+      addAxpEvent('sla_breach_alert', 'Voice', 'Wait time for Evelyn Carter exceeded AXP SLA threshold (120s).');
+    } else if (presetKey === 'preset-agent-util') {
+      addAxpEvent('metrics_report_gen', 'System', 'AXP live reporting engine compiled agent utilization telemetry.');
+    } else if (presetKey === 'preset-refund-policy') {
+      addAxpEvent('policy_inquiry', 'Chat', 'Customer requested refund contract terms. Triggering Aura SharePoint scan.');
+    } else if (presetKey === 'preset-churn-retention') {
+      addAxpEvent('churn_threat_flag', 'CRM', 'VIP Customer Jeff Edwards flagged as Churn Threat (sentiment score: 0.15).');
+      addAxpEvent('tandem_auth_request', 'System', 'Tandem Care requested authorization for Jeff Edwards credit discount approval.');
+    } else if (typeof foundCustomer !== 'undefined' && foundCustomer) {
+      addAxpEvent('customer_lookup', 'System', `Aura Analyst requested profile lookup for customer ${foundCustomer.name}.`);
+    }
   }
 
   // Iterate trace steps
@@ -1992,10 +2124,11 @@ let nodes = {
   ],
   mcpBus: { x: 250, y: 160, name: 'Avaya Infinity Gateway (MCP)' },
   repositories: [
-    { x: 420, y: 60, name: 'Call Log DB' },
-    { x: 420, y: 125, name: 'Zendesk CRM' },
-    { x: 420, y: 195, name: 'SharePoint KB' },
-    { x: 420, y: 260, name: 'Billing ERP' }
+    { x: 420, y: 40, name: 'AXP Cloud Events' },
+    { x: 420, y: 100, name: 'Call Log DB' },
+    { x: 420, y: 160, name: 'Zendesk CRM' },
+    { x: 420, y: 220, name: 'SharePoint KB' },
+    { x: 420, y: 280, name: 'Billing ERP' }
   ]
 };
 
@@ -2013,10 +2146,11 @@ function resizeCanvas() {
   
   nodes.mcpBus.x = w * 0.5; nodes.mcpBus.y = h * 0.5;
   
-  nodes.repositories[0].x = w * 0.85; nodes.repositories[0].y = h * 0.15;
-  nodes.repositories[1].x = w * 0.85; nodes.repositories[1].y = h * 0.38;
-  nodes.repositories[2].x = w * 0.85; nodes.repositories[2].y = h * 0.62;
-  nodes.repositories[3].x = w * 0.85; nodes.repositories[3].y = h * 0.85;
+  nodes.repositories[0].x = w * 0.85; nodes.repositories[0].y = h * 0.12;
+  nodes.repositories[1].x = w * 0.85; nodes.repositories[1].y = h * 0.31;
+  nodes.repositories[2].x = w * 0.85; nodes.repositories[2].y = h * 0.50;
+  nodes.repositories[3].x = w * 0.85; nodes.repositories[3].y = h * 0.69;
+  nodes.repositories[4].x = w * 0.85; nodes.repositories[4].y = h * 0.88;
 }
 
 window.addEventListener('resize', () => {
@@ -2029,7 +2163,7 @@ toggleArchLegacy.addEventListener('click', () => {
   state.archMode = 'legacy';
   toggleArchLegacy.classList.add('active');
   toggleArchMcp.classList.remove('active');
-  archConnectionsCount.innerHTML = '<span style="color:var(--color-avaya-red);">12</span> (Complex integration mess)';
+  archConnectionsCount.innerHTML = '<span style="color:var(--color-avaya-red);">15</span> (Complex integration mess)';
   addAuditLog('info', 'Gateway', 'Architecture diagram toggled to Legacy N x M Direct integrations.');
 });
 
@@ -2037,15 +2171,17 @@ toggleArchMcp.addEventListener('click', () => {
   state.archMode = 'mcp';
   toggleArchMcp.classList.add('active');
   toggleArchLegacy.classList.remove('active');
-  archConnectionsCount.innerHTML = '<span style="color:var(--color-cyan);">7</span> (Clean unified bus)';
+  archConnectionsCount.innerHTML = '<span style="color:var(--color-cyan);">9</span> (Clean unified bus)';
   addAuditLog('info', 'Gateway', 'Architecture diagram toggled to Avaya Infinity N+M MCP standard.');
 });
 
 function triggerArchVisualTransmission(toolTag) {
-  let targetIndex = 0;
-  if (toolTag.includes('postgresql_db') || toolTag.includes('call_metrics')) targetIndex = 0;
-  else if (toolTag.includes('salesforce_crm') || toolTag.includes('vip')) targetIndex = 1;
-  else if (toolTag.includes('sharepoint_kb') || toolTag.includes('search')) targetIndex = 2;
+  let targetIndex = 1; // Default to Call Log DB
+  if (toolTag.includes('axp') || toolTag.includes('event')) targetIndex = 0;
+  else if (toolTag.includes('postgresql_db') || toolTag.includes('call_metrics')) targetIndex = 1;
+  else if (toolTag.includes('salesforce_crm') || toolTag.includes('vip')) targetIndex = 2;
+  else if (toolTag.includes('sharepoint_kb') || toolTag.includes('search')) targetIndex = 3;
+  else if (toolTag.includes('billing') || toolTag.includes('tandem')) targetIndex = 4;
   
   const activeModelNode = nodes.models[1]; // Represents Gemini
   const targetRepoNode = nodes.repositories[targetIndex];
@@ -2220,6 +2356,9 @@ window.handleTandemApprove = function(customerName) {
     card.querySelector('.tandem-footer').style.display = 'none';
     
     addAuditLog('success', 'Tandem', `Supervisor Sarah authorized a 15% service credit discount for customer: Jeff Edwards`);
+    if (state.activeServers.axp_stream) {
+      addAxpEvent('apply_discount_auth', 'System', 'Tandem Care authorized retention credit for Jeff Edwards.');
+    }
     
     triggerArchVisualTransmission('salesforce_crm/apply_retention_discount');
     
@@ -2253,6 +2392,9 @@ window.handleTandemApprove = function(customerName) {
   card.querySelector('.tandem-footer').style.display = 'none';
   
   addAuditLog('success', 'Tandem', `Supervisor Sarah authorized queue escalation for customer(s): ${vips.map(v => v.name).join(', ')}`);
+  if (state.activeServers.axp_stream) {
+    addAxpEvent('escalate_vip_auth', 'System', `Tandem Care approved queue escalation for customer(s): ${vips.map(v => v.name).join(', ')}.`);
+  }
   
   triggerArchVisualTransmission('salesforce_crm/escalate_priority');
   
@@ -2275,6 +2417,9 @@ window.handleTandemDecline = function(customerName) {
     card.querySelector('.tandem-footer').style.display = 'none';
     
     addAuditLog('warning', 'Tandem', `Supervisor Sarah declined the retention discount offer for customer: Jeff Edwards`);
+    if (state.activeServers.axp_stream) {
+      addAxpEvent('discount_declined', 'System', 'Supervisor declined discount credit for Jeff Edwards.');
+    }
     
     setTimeout(() => {
       appendMessage('assistant', `Understood. The retention service credit discount for **${maskText('Jeff Edwards')}** was declined. I will notify the account manager to initiate standard cancellation procedures.`, 'A');
@@ -2306,6 +2451,9 @@ window.handleTandemDecline = function(customerName) {
   card.querySelector('.tandem-footer').style.display = 'none';
   
   addAuditLog('warning', 'Tandem', `Supervisor Sarah declined queue escalation request for customer(s): ${vips.map(v => v.name).join(', ')}`);
+  if (state.activeServers.axp_stream) {
+    addAxpEvent('escalation_declined', 'System', `Supervisor declined VIP queue escalation for customer(s): ${vips.map(v => v.name).join(', ')}.`);
+  }
   
   setTimeout(() => {
     appendMessage('assistant', `Understood. The queue escalation for ${namesStr} was declined. I will monitor the queue and alert you if wait times degrade further.`, 'A');
@@ -2433,6 +2581,22 @@ window.onload = () => {
     loadStoredSettings();
     updateSystemState();
     renderDataSiloTables();
+    
+    // AXP Telemetry Simulator Loop
+    addAxpEvent('voice_call_ingress', 'Voice', 'Ingress voice trunk SIP connection from +1-312-555-0199 routed to AXP Region 1.');
+    addAxpEvent('mcp_gateway_auth', 'System', 'Zero-Trust authorization token verified for client session. Discovery passed.');
+    addAxpEvent('latency_check', 'Voice', 'ACM Media Server reported 32ms round-trip latency and 0.01% packet loss.');
+    addAxpEvent('agent_assigned', 'Chat', 'AXP CCaaS agent "Agent Sarah" assigned to support chat.');
+
+    setInterval(() => {
+      if (state.activeServers.axp_stream) {
+        const randomEvt = axpEventsPool[Math.floor(Math.random() * axpEventsPool.length)];
+        if (tabPanelArch.classList.contains('active')) {
+          triggerArchVisualTransmission('axp_stream');
+        }
+        addAxpEvent(randomEvt.type, randomEvt.channel, randomEvt.details);
+      }
+    }, 4000);
     
     // Expose pre-load logs
     addAuditLog('info', 'Gateway', 'Secure gateway initialized on localhost:8080. Zero-Trust check passed.');
