@@ -381,9 +381,7 @@
               </div>
             </div>
             
-            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 16px; font-size: 0.825rem; line-height: 1.45; color: var(--text-secondary);">
-              <strong>Why this matters:</strong> In legacy systems, connecting <span style="color: var(--text-primary);">N</span> AI applications to <span style="color: var(--text-primary);">M</span> databases requires complex, fragile custom scripts for every single path. MCP acts as the <strong>"USB-C for AI"</strong>; each data repository is wrapped in a single MCP Server, and each model acts as a single Client, creating plug-and-play capability.
-            </div>
+            <div id="arch-roi-card" class="arch-roi-panel"></div>
           </div>
         </div>
 
@@ -700,6 +698,25 @@
                       <div class="progress-fill purple" id="fill-relevance" style="width: 97.2%;"></div>
                     </div>
                     <p class="card-desc">Relevance of fetched documents to query. Ensures no irrelevant content enters the LLM prompt window.</p>
+                  </div>
+                </div>
+                
+                <!-- Governance Compliance Audit dashboard -->
+                <div class="compliance-summary-card">
+                  <h4 class="compliance-title">🛡️ Governance Compliance Audit</h4>
+                  <div class="compliance-stats-grid">
+                    <div class="compliance-stat">
+                      <span class="compliance-stat-val" id="compliance-masked-count">24</span>
+                      <span class="compliance-stat-label">PII Masked (HIPAA)</span>
+                    </div>
+                    <div class="compliance-stat">
+                      <span class="compliance-stat-val" id="compliance-blocks-count">2</span>
+                      <span class="compliance-stat-label">Blocked Requests</span>
+                    </div>
+                    <div class="compliance-stat">
+                      <span class="compliance-stat-val" id="compliance-sla-status">100% SLA</span>
+                      <span class="compliance-stat-label">Compliance Health</span>
+                    </div>
                   </div>
                 </div>
               </div>

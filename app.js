@@ -22,6 +22,8 @@ const state = {
     restrictCallDb: false
   },
   archMode: 'mcp', // 'mcp' or 'legacy'
+  piiMaskedCount: 24,
+  blocksEnforcedCount: 2,
   isGenerating: false,
   messages: [],
   logs: []
@@ -534,10 +536,100 @@ function maskText(name) {
   if (!state.govPolicies.hipaaMasking) return name;
   if (!name) return name;
   const parts = name.split(' ');
-  return parts.map(part => {
+  const masked = parts.map(part => {
     if (part.length <= 1) return part;
     return part[0] + '***';
   }).join(' ');
+  
+  if (state.isGenerating && masked !== name) {
+    state.piiMaskedCount++;
+    updateComplianceDashboard();
+  }
+  return masked;
+}
+
+function updateComplianceDashboard() {
+  const piiCountEl = document.getElementById('compliance-masked-count');
+  const blocksCountEl = document.getElementById('compliance-blocks-count');
+  const slaStatusEl = document.getElementById('compliance-sla-status');
+  
+  if (piiCountEl) piiCountEl.innerText = state.piiMaskedCount;
+  if (blocksCountEl) blocksCountEl.innerText = state.blocksEnforcedCount;
+  
+  if (slaStatusEl) {
+    if (state.blocksEnforcedCount > 8) {
+      slaStatusEl.innerText = "92% SLA";
+      slaStatusEl.className = "compliance-stat-val";
+      slaStatusEl.style.color = "var(--color-yellow)";
+    } else {
+      slaStatusEl.innerText = "100% SLA";
+      slaStatusEl.className = "compliance-stat-val healthy";
+      slaStatusEl.style.color = "var(--color-green)";
+    }
+  }
+}
+
+function updateArchRoiView() {
+  const roiCard = document.getElementById('arch-roi-card');
+  if (!roiCard) return;
+  
+  if (state.archMode === 'mcp') {
+    roiCard.innerHTML = `
+      <div class="roi-header">
+        <span class="roi-title">Architecture Business Case & ROI</span>
+        <span class="roi-badge mcp">Avaya Infinity Standard (MCP)</span>
+      </div>
+      <div class="roi-grid">
+        <div class="roi-metric">
+          <span class="roi-metric-val highlight-green">$15,000 / yr</span>
+          <span class="roi-metric-label">Integration TCO</span>
+        </div>
+        <div class="roi-metric">
+          <span class="roi-metric-val highlight-green">2 Hours</span>
+          <span class="roi-metric-label">Deployment Time</span>
+        </div>
+        <div class="roi-metric">
+          <span class="roi-metric-val">90%</span>
+          <span class="roi-metric-label">Cost Savings</span>
+        </div>
+        <div class="roi-metric">
+          <span class="roi-metric-val highlight-green">Protected</span>
+          <span class="roi-metric-label">Security & Compliance</span>
+        </div>
+      </div>
+      <p class="roi-explanation">
+        <strong>Value Realization:</strong> By wrapping data source access behind standardized MCP schemas (Model Context Protocol), Avaya Infinity reduces integration friction to standard client-server APIs. No custom connectors, unified tokens, and instant LLM tool capability, lowering security audit scope from N×M endpoints to a single gateway bus.
+      </p>
+    `;
+  } else {
+    roiCard.innerHTML = `
+      <div class="roi-header">
+        <span class="roi-title">Architecture Business Case & ROI</span>
+        <span class="roi-badge legacy">Legacy N x M Connectors</span>
+      </div>
+      <div class="roi-grid">
+        <div class="roi-metric">
+          <span class="roi-metric-val highlight-yellow">$150,000 / yr</span>
+          <span class="roi-metric-label">Integration TCO</span>
+        </div>
+        <div class="roi-metric">
+          <span class="roi-metric-val highlight-yellow">4 Months</span>
+          <span class="roi-metric-label">Deployment Time</span>
+        </div>
+        <div class="roi-metric">
+          <span class="roi-metric-val">0%</span>
+          <span class="roi-metric-label">Cost Savings</span>
+        </div>
+        <div class="roi-metric">
+          <span class="roi-metric-val highlight-yellow">High Risk</span>
+          <span class="roi-metric-label">Security & Compliance</span>
+        </div>
+      </div>
+      <p class="roi-explanation">
+        <strong>Value Friction:</strong> Direct integrations require writing N×M bespoke pipelines, separate API tokens per application, and custom parsing scripts. Security teams must audit every point-to-point connection, delaying time-to-market and increasing data exposure risks with unmonitored credentials in static files.
+      </p>
+    `;
+  }
 }
 
 // Security: Mask sensitive attributes in JSON payloads if HIPAA policy active
@@ -638,6 +730,8 @@ function saveSettings() {
   }
   
   addAuditLog('success', 'Config', `Saved settings. Mode: ${state.apiMode}. Masking: ${state.govPolicies.hipaaMasking}. SQL Restrict: ${state.govPolicies.restrictCallDb}`);
+  renderDataSiloTables();
+  updateComplianceDashboard();
   settingsModal.classList.remove('active');
 }
 
@@ -792,6 +886,7 @@ function switchTab(target) {
     tabBtnArch.classList.add('active');
     tabPanelArch.classList.add('active');
     initArchCanvas();
+    updateArchRoiView();
   } else if (target === 'audit') {
     tabBtnAudit.classList.add('active');
     tabPanelAudit.classList.add('active');
@@ -1157,7 +1252,7 @@ const mcpTools = {
 // UI Logic for Handling Submissions (Chat Entrypoint)
 // ----------------------------------------------------
 
-function appendMessage(sender, text, avatarChar) {
+function appendMessage(sender, text, avatarChar, businessOutcome = null) {
   const messageDiv = document.createElement('div');
   messageDiv.className = `message ${sender}`;
   
@@ -1171,6 +1266,19 @@ function appendMessage(sender, text, avatarChar) {
   // Format markdown inside text
   let htmlContent = formatMarkdownText(text);
   bubbleDiv.innerHTML = htmlContent;
+  
+  if (sender === 'assistant' && businessOutcome) {
+    const outcomeCard = document.createElement('div');
+    outcomeCard.className = 'business-outcome-card';
+    outcomeCard.innerHTML = `
+      <div class="business-outcome-header">
+        <span class="business-outcome-title">${businessOutcome.title}</span>
+        <span class="business-outcome-badge">${businessOutcome.badge}</span>
+      </div>
+      <div class="business-outcome-desc">${businessOutcome.desc}</div>
+    `;
+    bubbleDiv.appendChild(outcomeCard);
+  }
   
   if (sender === 'user') {
     messageDiv.appendChild(bubbleDiv);
@@ -1316,6 +1424,11 @@ async function runSimulatedToolLoop(presetKey, userText) {
   const presetConfig = {
     'preset-wait-time': {
       requiredServers: ['postgresql_db', 'salesforce_crm'],
+      businessOutcome: {
+        title: "Optimize Queue Allocation & Avoid SLA Penalty",
+        desc: "Strategic Outcome: Identified mandatory agent training conflict. Rescheduling breaks and routing digital inquiries saved $3,200/day in SLA penalties and restored ASA (Average Speed of Answer) from 185s to 15s.",
+        badge: "Queue Performance"
+      },
       steps: [
         {
           title: 'Query PostgreSQL Database (Call Log DB)',
@@ -1395,6 +1508,11 @@ async function runSimulatedToolLoop(presetKey, userText) {
     },
     'preset-vip-escalate': {
       requiredServers: ['salesforce_crm'],
+      businessOutcome: {
+        title: "Secure VIP Contracts & Reduce High-Tier Churn",
+        desc: "Enterprise Agility: Aura AI detected VIP callers waiting in queue with active jitter spikes. Promptly escalated to L3 routing, retaining $24,000 in VIP ARR and securing a 100% CSAT rating.",
+        badge: "Contract Security"
+      },
       steps: [
         {
           title: 'Query Zendesk CRM (VIP Queues)',
@@ -1454,6 +1572,11 @@ async function runSimulatedToolLoop(presetKey, userText) {
     },
     'preset-agent-util': {
       requiredServers: ['postgresql_db', 'salesforce_crm'],
+      businessOutcome: {
+        title: "Maximized Agent Utilization & Digital Deflection",
+        desc: "Resource Optimization: Mapped voice vs chat ratios. Suggested shifting 4 chat agents to voice queues to balance peak loads, improving capacity utilization by 18% without adding headcount.",
+        badge: "Staffing Efficiency"
+      },
       steps: [
         {
           title: 'Query Live Channel Volume',
@@ -1531,6 +1654,11 @@ async function runSimulatedToolLoop(presetKey, userText) {
     },
     'preset-refund-policy': {
       requiredServers: ['sharepoint_kb'],
+      businessOutcome: {
+        title: "Accelerated First-Contact Resolution & Compliance",
+        desc: "Agile Support: Exposed SharePoint contract clause regarding refunds instantly via MCP. Reduced research time from 12 minutes to 2 seconds, boosting agent FCR by 35%.",
+        badge: "Operational Speed"
+      },
       steps: [
         {
           title: 'Search SharePoint Knowledge Base',
@@ -1560,6 +1688,11 @@ async function runSimulatedToolLoop(presetKey, userText) {
     },
     'preset-churn-retention': {
       requiredServers: ['salesforce_crm', 'sharepoint_kb'],
+      businessOutcome: {
+        title: "Prevented Account Cancellation & Retained ARR",
+        desc: "Revenue Safeguard: Leveraged SharePoint policy guidelines to apply a 15% discount structure ($1,260 credit) to Jeff Edwards' $8,400 contract, achieving 6.6x ROI relative to customer acquisition cost.",
+        badge: "Revenue Retention"
+      },
       steps: [
         {
           title: 'Query CRM Support Profile: J*** E***',
@@ -1619,6 +1752,11 @@ async function runSimulatedToolLoop(presetKey, userText) {
     },
     'preset-incoming-calls': {
       requiredServers: ['postgresql_db', 'salesforce_crm'],
+      businessOutcome: {
+        title: "Deflected Support Overhead & Self-Service ROI",
+        desc: "Deflection Agility: Managed 14,820 monthly incoming logs. Deflected 40% of chat requests to automated AI self-service dialogs, saving approximately $12,500/month in manual labor expenses.",
+        badge: "Deflection ROI"
+      },
       steps: [
         {
           title: 'Query Monthly Call Database',
@@ -2012,6 +2150,8 @@ async function runSimulatedToolLoop(presetKey, userText) {
       payloadPre.style.color = 'var(--color-avaya-red)';
       payloadPre.innerText = `{\n  "error": "${err.message}"\n}`;
       addAuditLog('warning', 'Audit', `Access Blocked: ${err.message}`);
+      state.blocksEnforcedCount++;
+      updateComplianceDashboard();
       
       await sleep(1000);
       const errorMsg = `
@@ -2032,7 +2172,7 @@ async function runSimulatedToolLoop(presetKey, userText) {
   // Render Response
   addAuditLog('info', 'Model', 'Model formulating final markdown responses.');
   await sleep(1000);
-  appendMessage('assistant', scenario.generate(), 'A');
+  appendMessage('assistant', scenario.generate(), 'A', scenario.businessOutcome);
   scenario.render();
 }
 
@@ -2394,6 +2534,7 @@ toggleArchLegacy.addEventListener('click', () => {
   toggleArchMcp.classList.remove('active');
   archConnectionsCount.innerHTML = '<span style="color:var(--color-avaya-red);">15</span> (Complex integration mess)';
   addAuditLog('info', 'Gateway', 'Architecture diagram toggled to Legacy N x M Direct integrations.');
+  updateArchRoiView();
 });
 
 toggleArchMcp.addEventListener('click', () => {
@@ -2402,6 +2543,7 @@ toggleArchMcp.addEventListener('click', () => {
   toggleArchLegacy.classList.remove('active');
   archConnectionsCount.innerHTML = '<span style="color:var(--color-cyan);">9</span> (Clean unified bus)';
   addAuditLog('info', 'Gateway', 'Architecture diagram toggled to Avaya Infinity N+M MCP standard.');
+  updateArchRoiView();
 });
 
 function triggerArchVisualTransmission(toolTag) {
@@ -2592,7 +2734,12 @@ window.handleTandemApprove = function(customerName) {
     triggerArchVisualTransmission('salesforce_crm/apply_retention_discount');
     
     setTimeout(() => {
-      appendMessage('assistant', `I have successfully updated the CRM record for **${maskText('Jeff Edwards')}** and applied a 15% monthly billing discount to prevent account cancellation. The Databricks compliance audit log has been updated.`, 'A');
+      const approvedOutcome = {
+        title: "Discounts Authorized & Retention Locked",
+        desc: "Contract Saved: Applying the approved 15% monthly discount to Jeff Edwards ($1,260 credit) retains $8,400 in contract ARR, resulting in a 6.6x ROI on retention.",
+        badge: "ARR Retained"
+      };
+      appendMessage('assistant', `I have successfully updated the CRM record for **${maskText('Jeff Edwards')}** and applied a 15% monthly billing discount to prevent account cancellation. The Databricks compliance audit log has been updated.`, 'A', approvedOutcome);
     }, 1500);
     return;
   }
@@ -2628,7 +2775,12 @@ window.handleTandemApprove = function(customerName) {
   triggerArchVisualTransmission('salesforce_crm/escalate_priority');
   
   setTimeout(() => {
-    appendMessage('assistant', `I have successfully escalated the queue priority for ${namesStr}. They have been rerouted to L3 specialized support. The Unity Catalog compliance audit trail has been archived.`, 'A');
+    const approvedVipEscalationOutcome = {
+      title: "VIP SLA Restored & Churn Risk Averted",
+      desc: "Priority Routing Active: Diverted VIP calls to L3 engineers. Reduced VIP queue wait time down to 10 seconds, retaining $24,000 in account ARR.",
+      badge: "SLA Restored"
+    };
+    appendMessage('assistant', `I have successfully escalated the queue priority for ${namesStr}. They have been rerouted to L3 specialized support. The Unity Catalog compliance audit trail has been archived.`, 'A', approvedVipEscalationOutcome);
   }, 1500);
 };
 
@@ -2814,6 +2966,10 @@ window.onload = () => {
     // Initialize ACM Telemetry Chart & View
     initAcmTelemetryChart();
     updateAcmStatusView();
+    
+    // Initialize Business outcome dashboards
+    updateComplianceDashboard();
+    updateArchRoiView();
     
     // AXP Telemetry Simulator Loop
     addAxpEvent('voice_call_ingress', 'Voice', 'Ingress voice trunk SIP connection from +1-312-555-0199 routed to AXP Region 1.');

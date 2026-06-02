@@ -1906,6 +1906,188 @@ input:checked + .slider:before {
   margin-bottom: 0 !important;
 }
 
+/* Business Outcome Card */
+.business-outcome-card {
+  margin-top: 10px;
+  background: rgba(16, 185, 129, 0.04);
+  border-left: 3px solid var(--color-green);
+  border-radius: 4px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.business-outcome-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.business-outcome-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-green);
+  background: rgba(16, 185, 129, 0.15);
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+
+.business-outcome-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.business-outcome-desc {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* Compliance Summary Card */
+.compliance-summary-card {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.85rem;
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.compliance-title {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--color-green);
+  letter-spacing: 0.05em;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.compliance-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.compliance-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  padding: 8px;
+  text-align: center;
+}
+
+.compliance-stat-val {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.compliance-stat-val.healthy {
+  color: var(--color-green);
+}
+
+.compliance-stat-label {
+  font-size: 0.62rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  line-height: 1.2;
+}
+
+/* Architecture Playground ROI Panel */
+.arch-roi-panel {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 0.75rem;
+}
+
+.roi-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.roi-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.roi-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+
+.roi-badge.mcp {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--color-green);
+}
+
+.roi-badge.legacy {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--color-yellow);
+}
+
+.roi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.roi-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.roi-metric-val {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.roi-metric-val.highlight-green {
+  color: var(--color-green);
+}
+
+.roi-metric-val.highlight-yellow {
+  color: var(--color-yellow);
+}
+
+.roi-metric-label {
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.roi-explanation {
+  margin-top: 0.75rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
 
 
 
