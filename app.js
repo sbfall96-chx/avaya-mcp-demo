@@ -424,6 +424,71 @@ window.addEventListener('click', (e) => {
 const tabBtns = [tabBtnTrace, tabBtnSilos, tabBtnArch, tabBtnAudit];
 const tabPanels = [tabPanelTrace, tabPanelSilos, tabPanelArch, tabPanelAudit];
 
+const tabExplainers = {
+  trace: {
+    badge: 'Protocol Insight',
+    title: 'Live Protocol Trace',
+    desc: 'Step-by-step inspection of standard JSON payloads exchanged between the AI brain and enterprise database servers.',
+    value: 'Standardizes AI connections (Model Context Protocol), replacing legacy custom code integrations ($N × M$) with a single open standard ($N+M$).',
+    color: 'var(--color-cyan)',
+    bg: 'rgba(0, 240, 255, 0.1)'
+  },
+  silos: {
+    badge: 'Zero-Copy Architecture',
+    title: 'Unified Lakehouse & Silos',
+    desc: 'Live analytical tables illustrating mock PostgreSQL customer database, Salesforce CRM records, and SharePoint KB repositories.',
+    value: 'Eliminates data migration overhead. AI queries across siloed legacy data sources securely, using read-only API schemas on-the-fly.',
+    color: 'var(--color-yellow)',
+    bg: 'rgba(245, 158, 11, 0.1)'
+  },
+  arch: {
+    badge: 'Complexity Reduction',
+    title: 'Architecture Playground',
+    desc: 'Interactive network particle flow representing spaghetti integrations versus modern open standard connection orchestration.',
+    value: 'Visualizes structural changes. Reduces active enterprise integration connection overhead by up to 70%, slashing maintenance costs.',
+    color: 'var(--color-purple)',
+    bg: 'rgba(139, 92, 246, 0.1)'
+  },
+  audit: {
+    badge: 'Zero-Trust Audit',
+    title: 'Databricks Governance Log',
+    desc: 'Real-time security logs showing role-based queries, API routing restrictions, and automatic PII redaction actions.',
+    value: 'HIPAA/GDPR Compliance. Ensures that every AI model request is logged, audited, and strictly permission-checked by Databricks Unity Catalog.',
+    color: 'var(--color-green)',
+    bg: 'rgba(16, 185, 129, 0.1)'
+  }
+};
+
+function updateTabExplainer(target) {
+  const banner = document.getElementById('tab-explainer-banner');
+  const badge = document.getElementById('explainer-badge');
+  const title = document.getElementById('explainer-title');
+  const desc = document.getElementById('explainer-desc');
+  const valText = document.getElementById('explainer-value-text');
+  
+  if (!banner || !badge || !title || !desc || !valText) return;
+  
+  const info = tabExplainers[target];
+  if (!info) return;
+  
+  badge.innerText = info.badge;
+  title.innerText = info.title;
+  desc.innerText = info.desc;
+  valText.innerText = info.value;
+  
+  badge.style.color = info.color;
+  badge.style.background = info.bg;
+  banner.style.borderLeftColor = info.color;
+  
+  // Subtle animation
+  banner.style.transform = 'scale(0.99)';
+  banner.style.opacity = '0.85';
+  setTimeout(() => {
+    banner.style.transform = 'scale(1)';
+    banner.style.opacity = '1';
+  }, 100);
+}
+
 function switchTab(target) {
   tabBtns.forEach(btn => btn.classList.remove('active'));
   tabPanels.forEach(panel => panel.classList.remove('active'));
@@ -443,6 +508,8 @@ function switchTab(target) {
     tabBtnAudit.classList.add('active');
     tabPanelAudit.classList.add('active');
   }
+  
+  updateTabExplainer(target);
 }
 
 tabBtnTrace.addEventListener('click', () => switchTab('trace'));
