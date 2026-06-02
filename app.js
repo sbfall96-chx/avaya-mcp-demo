@@ -315,7 +315,7 @@ function renderAxpEventsTable() {
       <td style="color: var(--text-secondary);">${evt.time}</td>
       <td><span class="log-badge ${evt.type.includes('alert') || evt.type.includes('threat') ? 'warning' : evt.type.includes('auth') || evt.type.includes('apply') || evt.type.includes('approve') ? 'success' : 'info'}" style="font-size: 0.65rem; padding: 2px 4px;">${evt.type}</span></td>
       <td><span style="color: ${evt.channel === 'Voice' ? 'var(--color-avaya-red)' : evt.channel === 'Chat' ? 'var(--color-cyan)' : evt.channel === 'SMS' ? 'var(--color-green)' : 'var(--color-purple)'}">${evt.channel}</span></td>
-      <td style="color: var(--text-primary); text-align: left;">${maskText(evt.details)}</td>
+      <td style="color: var(--text-primary); text-align: left;">${maskSentenceText(evt.details)}</td>
     `;
     tbody.appendChild(tr);
   });
@@ -330,6 +330,24 @@ function maskText(name) {
     if (part.length <= 1) return part;
     return part[0] + '***';
   }).join(' ');
+}
+
+// Security: Mask only actual customer names within any sentence or string
+function maskSentenceText(text) {
+  if (!state.govPolicies.hipaaMasking) return text;
+  if (!text) return text;
+  
+  let result = text;
+  const crmNames = localDatabases.salesforce_crm.map(c => c.name);
+  const dbNames = localDatabases.postgresql_db.map(d => d.name);
+  const allNames = [...new Set([...crmNames, ...dbNames])];
+  
+  allNames.forEach(name => {
+    if (result.includes(name)) {
+      result = result.replaceAll(name, maskText(name));
+    }
+  });
+  return result;
 }
 
 // Security: Mask sensitive attributes in JSON payloads if HIPAA policy active
@@ -1682,7 +1700,7 @@ async function runSimulatedToolLoop(presetKey, userText) {
               <td>${evt.time}</td>
               <td><span class="log-badge info">${evt.type}</span></td>
               <td><span style="color: ${evt.channel === 'Voice' ? 'var(--color-avaya-red)' : evt.channel === 'Chat' ? 'var(--color-cyan)' : 'var(--color-green)'}">${evt.channel}</span></td>
-              <td>${maskText(evt.details)}</td>
+              <td>${maskSentenceText(evt.details)}</td>
             </tr>`;
           });
           html += `</tbody></table></div>`;
