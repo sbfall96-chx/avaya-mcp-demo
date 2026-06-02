@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Avaya Infinity MCP – Secure AI Orchestration & Analytics Control Center</title>
+  <meta name="description" content="Explore Avaya Infinity powered by Model Context Protocol (MCP) and Databricks. Securely connect multiple AI models to CRM, databases, and enterprise data silos with zero friction.">
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- ChartJS CDN for live responsive analytical dashboards -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Diagnostic startup test -->
+  <script>
+    console.log("Diagnostic inline script started.");
+  </script>
+</head>
+<body>
+
+  <!-- App Header -->
+  <header class="app-header" id="app-header-sec">
+    <div class="brand-section">
+      <!-- Avaya-themed inline SVG logo -->
+      <svg class="brand-logo" viewBox="0 0 200 45" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12.5 5h8.8L37.5 40h-8.2L16.9 12.3 4.5 40H0L12.5 5zm31.7 0h7.3l10.9 25.1L73.3 5h7.3L63.8 40h-5.9L44.2 5zm37.3 35h-4.3l15.1-35h5.4l15.1 35h-4.6l-3.6-8.8H92.2l-3.6 8.8zm5.7-14.2h18.2L101 10.3l-9.1 20.8zm39.1 14.2h-4.5V5h4.5v35zm17.9 0h-4.3l15.1-35h5.4l15.1 35h-4.6l-3.6-8.8H181l-3.6 8.8zm5.7-14.2H192l-9.1-20.8-9.1 20.8z"/>
+      </svg>
+      <h1 class="brand-title" id="main-brand-title">INFINITY <span style="font-weight: 300; font-size: 0.85em; color: var(--text-secondary);">MCP</span></h1>
+    </div>
+
+    <div class="system-status">
+      <div class="status-indicator" id="status-indicator">
+        <div class="status-dot" id="system-status-dot"></div>
+        <span id="system-status-text">MCP Gateway: Secure</span>
+      </div>
+      <div class="model-selector-wrapper">
+        <span style="font-size: 0.8rem; color: var(--text-secondary);">BYOAI Brain:</span>
+        <select class="model-select" id="model-selector" aria-label="Select AI Model Brain">
+          <option value="claude-3-5">Claude 3.5 Sonnet (Anthropic)</option>
+          <option value="gemini-1-5" selected>Gemini 1.5 Pro (Google DeepMind)</option>
+          <option value="gpt-4o">GPT-4o (OpenAI)</option>
+          <option value="llama-3">Llama 3.1 70B (Open Weights)</option>
+        </select>
+      </div>
+      <button class="gear-btn" id="settings-gear-btn" aria-label="Settings and API Configuration">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Settings & API Modal -->
+  <div class="modal-overlay" id="settings-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Gateway & API Configurations</h2>
+        <button class="modal-close-btn" id="modal-close-x" aria-label="Close Settings">&times;</button>
+      </div>
+      
+      <!-- API Mode selector -->
+      <div class="form-group">
+        <label for="api-mode-select">AI Generation Mode</label>
+        <select class="form-input" id="api-mode-select">
+          <option value="simulated">Simulated Model (Local Offline)</option>
+          <option value="live-gemini">Live Gemini API (Requires Key)</option>
+        </select>
+      </div>
+
+      <!-- Gemini API Key input -->
+      <div class="form-group" id="gemini-key-group" style="display: none;">
+        <label for="gemini-api-key">Gemini API Key</label>
+        <input type="password" class="form-input" id="gemini-api-key" placeholder="Enter AI_KEY_HERE (Saved locally)...">
+        <p style="font-size: 0.65rem; color: var(--text-secondary); margin-top: 2px;">Your key is sent directly to Google APIs client-side and never stored elsewhere.</p>
+      </div>
+
+      <!-- Compliance Toggles (Databricks security) -->
+      <div class="form-group" style="margin-top: 1rem;">
+        <label>Databricks Governance Rules</label>
+        <div class="gov-toggles">
+          <div class="gov-row">
+            <div class="gov-info">
+              <span class="gov-name">PII Data Masking (HIPAA)</span>
+              <span class="gov-desc">Redact names/sensitive text in tool payloads.</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="gov-toggle-hipaa">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="gov-row">
+            <div class="gov-info">
+              <span class="gov-name">Restrict Call DB Access</span>
+              <span class="gov-desc">Revoke database SELECT catalog permissions.</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="gov-toggle-restrict">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-btn cancel" id="settings-cancel-btn">Cancel</button>
+        <button class="btn-btn save" id="settings-save-btn">Save Configurations</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Workspace Grid -->
+  <main class="workspace-grid" id="main-workspace-grid">
+    
+    <!-- Left Column: Chat Console -->
+    <section class="chat-panel" id="chat-panel-container">
+      <div class="chat-header">
+        <div class="analyst-profile">
+          <div class="analyst-avatar">A</div>
+          <div class="analyst-details">
+            <h2>Aura AI Analyst</h2>
+            <p><span class="status-dot" style="width: 6px; height: 6px; animation: none;"></span> Connected to MCP Gateway</p>
+          </div>
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-secondary); display: flex; align-items: center; gap: 8px;">
+          <span>Session Audit:</span>
+          <select class="model-select" id="session-selector" style="padding: 2px 6px; font-family: var(--font-mono); color: var(--color-cyan); background: rgba(0,240,255,0.05); border-color: rgba(0,240,255,0.2);" aria-label="Select Chat Session History">
+            <option value="AV-9842" selected>AV-9842 (Active)</option>
+            <option value="AV-9841">AV-9841 (Spike Audit)</option>
+            <option value="AV-9840">AV-9840 (Contract Search)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Chat History -->
+      <div class="chat-history" id="chat-history-list">
+        <!-- AI Greeting -->
+        <div class="message assistant">
+          <div class="msg-avatar">A</div>
+          <div class="msg-bubble">
+            <p>Welcome to the **Avaya Infinity MCP Orchestration Dashboard**. I am your Aura AI agent, dynamically mapped to your communications ecosystem via open MCP standards.</p>
+            <p>I have secure, read-write access to connected databases, CRMs, and knowledge repositories, audited via **Databricks Unity Catalog**. How can I help you optimize your contact center operations today?</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Scenarios (Supervisor Presets) -->
+      <div class="scenarios-container">
+        <h2 class="scenarios-title" id="scenario-title-label">Supervisor Presets (Mock Scenarios)</h2>
+        <div class="scenarios-grid">
+          <button class="scenario-btn" id="preset-wait-time" aria-label="Trigger Peak Wait Time Analysis">
+            <span class="tag">Analysis</span>
+            <strong>Peak Wait-Time Spike</strong>
+            <span style="font-size: 0.7rem; color: var(--text-secondary);">Cross-reference database logs to diagnose wait spike at 2 PM.</span>
+          </button>
+          
+          <button class="scenario-btn" id="preset-vip-escalate" aria-label="Trigger VIP Escalation Scenario">
+            <span class="tag">Action Dispatch</span>
+            <strong>VIP CRM Escalation</strong>
+            <span style="font-size: 0.7rem; color: var(--text-secondary);">Scan Zendesk queues and elevate priority for high-value customers.</span>
+          </button>
+          
+          <button class="scenario-btn" id="preset-agent-util" aria-label="Trigger Agent Utilization Report">
+            <span class="tag">Dashboard Gen</span>
+            <strong>Real-time Queue Volume</strong>
+            <span style="font-size: 0.7rem; color: var(--text-secondary);">Chart active queue volumes by channel & agent availability.</span>
+          </button>
+          
+          <button class="scenario-btn" id="preset-refund-policy" aria-label="Trigger Policy Search Scenario">
+            <span class="tag">Knowledge base</span>
+            <strong>Disputed Contract Policy</strong>
+            <span style="font-size: 0.7rem; color: var(--text-secondary);">Search SharePoint knowledge base for contract refund eligibility rules.</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Input box -->
+      <div class="chat-input-wrapper">
+        <div class="input-container">
+          <input type="text" class="chat-input" id="chat-input-field" placeholder="Ask Aura Analyst (e.g. 'Show active call volumes' or 'Search ticket history for VIPs')..." aria-label="Ask Aura Analyst">
+          <button class="send-btn" id="chat-send-btn" aria-label="Send Message">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Column: MCP Engine Visualizer -->
+    <section class="mcp-panel" id="mcp-visualizer-panel">
+      <!-- Tabs -->
+      <nav class="mcp-tabs" aria-label="MCP Information Tabs">
+        <button class="tab-btn active" id="tab-btn-trace" aria-controls="tab-panel-trace">Live Protocol Trace</button>
+        <button class="tab-btn" id="tab-btn-silos" aria-controls="tab-panel-silos">Unified Lakehouse & Silos</button>
+        <button class="tab-btn" id="tab-btn-arch" aria-controls="tab-panel-arch">Architecture Playground</button>
+        <button class="tab-btn" id="tab-btn-audit" aria-controls="tab-panel-audit">Databricks Governance Log</button>
+      </nav>
+
+      <!-- Tab Content Area -->
+      <div class="tab-content-container">
+        
+        <!-- Tab 1: Live Protocol Trace -->
+        <div class="tab-panel active" id="tab-panel-trace">
+          <div class="trace-timeline" id="trace-timeline-list">
+            
+            <div class="trace-step completed">
+              <div class="step-marker">1</div>
+              <div class="step-details">
+                <div class="step-header">
+                  <h3 class="step-title">Client Context Established</h3>
+                  <span class="step-tag" style="color: var(--color-cyan);">client/initialize</span>
+                </div>
+                <p class="step-desc">Avaya Infinity client provides session variables and security tokens.</p>
+                <pre class="json-payload" id="init-payload">{
+  "client": "Avaya Infinity Web Console",
+  "version": "v3.12-Infinity",
+  "session": {
+    "user": "Supervisor Sarah",
+    "role": "CX-Director",
+    "region": "US-East-1",
+    "token_state": "Valid"
+  }
+}</pre>
+              </div>
+            </div>
+
+            <div id="dynamic-trace-steps-container">
+              <div style="text-align: center; color: var(--text-muted); padding: 40px 20px; font-size: 0.9rem;" id="trace-placeholder">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 8px; opacity: 0.5;">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+                <p>Waiting for query dispatch...</p>
+                <p style="font-size: 0.75rem; margin-top: 4px;">Select a preset scenario or type a query to see real-time MCP schema exchanges.</p>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+
+        <!-- Tab 2: Architecture comparison -->
+        <div class="tab-panel" id="tab-panel-arch">
+          <div class="arch-playground">
+            <!-- Edify sub-tabs -->
+            <div class="arch-sub-tabs">
+              <button class="sub-tab-btn active" id="sub-tab-network">Network Topology (MCP Bus)</button>
+              <button class="sub-tab-btn" id="sub-tab-edify">Edify Journey Orchestrator</button>
+            </div>
+
+            <div class="arch-controls" id="arch-network-controls">
+              <div class="arch-toggle">
+                <button class="toggle-btn" id="toggle-arch-legacy">Legacy (N x M Custom)</button>
+                <button class="toggle-btn active" id="toggle-arch-mcp">Avaya Infinity (N + M MCP)</button>
+              </div>
+              <div class="arch-stats">
+                <span>Active Connections: </span>
+                <span class="highlight" id="arch-connections-count">4</span>
+              </div>
+            </div>
+
+            <!-- Interactive SVG/Canvas wrapper -->
+            <div class="arch-canvas-container" id="canvas-wrapper">
+              <canvas id="architecture-canvas"></canvas>
+            </div>
+
+            <!-- Edify Journey Flowchart wrapper -->
+            <div class="edify-flowchart-container" id="edify-flowchart-wrapper" style="display: none;">
+              <div class="edify-flow-header">
+                <h4>Dynamic Journey Orchestrator (No-Code Flows)</h4>
+                <p>Visualizing customer interaction pathways routed in real-time through Avaya Infinity policy engines.</p>
+              </div>
+              <div class="edify-nodes-grid">
+                <div class="edify-node" data-node="customer">
+                  <div class="node-pulse-circle"></div>
+                  <div class="node-icon">📞</div>
+                  <div class="node-title">Incoming CX Stream</div>
+                  <div class="node-desc">Voice SIP trunks or WebRTC messaging channels.</div>
+                </div>
+                <div class="edify-connector">
+                  <span class="arrow-line"></span>
+                </div>
+                <div class="edify-node" data-node="orchestrator">
+                  <div class="node-pulse-circle"></div>
+                  <div class="node-icon">⚡</div>
+                  <div class="node-title">Edify Policy Engine</div>
+                  <div class="node-desc">Evaluates schedules, routing priorities, and customer history.</div>
+                </div>
+                <div class="edify-connector">
+                  <span class="arrow-line"></span>
+                </div>
+                <div class="edify-node" data-node="mcp-gateway">
+                  <div class="node-pulse-circle"></div>
+                  <div class="node-icon">🛡️</div>
+                  <div class="node-title">MCP Secure Gateway</div>
+                  <div class="node-desc">Exposes database connections & unified tool schemas to LLMs.</div>
+                </div>
+                <div class="edify-connector">
+                  <span class="arrow-line"></span>
+                </div>
+                <div class="edify-node" data-node="tandem-care">
+                  <div class="node-pulse-circle"></div>
+                  <div class="node-icon">🤝</div>
+                  <div class="node-title">Tandem Care Hub</div>
+                  <div class="node-desc">Collaborates human agents with Agentic AI assistants.</div>
+                </div>
+              </div>
+              
+              <div class="edify-node-details-card" id="edify-node-details-card">
+                Hover over any orchestration node above to inspect its real-time telemetry and active call packets.
+              </div>
+            </div>
+            
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 16px; font-size: 0.825rem; line-height: 1.45; color: var(--text-secondary);">
+              <strong>Why this matters:</strong> In legacy systems, connecting <span style="color: var(--text-primary);">N</span> AI applications to <span style="color: var(--text-primary);">M</span> databases requires complex, fragile custom scripts for every single path. MCP acts as the <strong>"USB-C for AI"</strong>; each data repository is wrapped in a single MCP Server, and each model acts as a single Client, creating plug-and-play capability.
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 4: Data Silos Editor -->
+        <div class="tab-panel" id="tab-panel-silos">
+          <div class="silo-grid">
+            
+            <!-- Silo 1: PostgreSQL Call Logs -->
+            <div class="silo-section">
+              <div class="silo-title">
+                <span>SQL Database (PostgreSQL Lakehouse Logs)</span>
+                <span style="font-size: 0.7rem; font-weight: normal; color: var(--text-secondary);" id="db-row-count">5 logs</span>
+              </div>
+              <div class="silo-wrapper">
+                <div class="silo-table-container">
+                  <table class="silo-table">
+                    <thead>
+                      <tr><th>Time</th><th>Name</th><th>Wait (s)</th><th>Channel</th></tr>
+                    </thead>
+                    <tbody id="silo-db-tbody">
+                      <!-- Rendered dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+                <div class="silo-form">
+                  <div class="silo-form-title">Add Call Log Record</div>
+                  <div class="silo-form-row">
+                    <div class="form-group">
+                      <label style="font-size:0.6rem;">Time</label>
+                      <input type="text" class="form-input" id="db-input-time" value="14:15" style="padding: 6px;">
+                    </div>
+                    <div class="form-group">
+                      <label style="font-size:0.6rem;">Name</label>
+                      <input type="text" class="form-input" id="db-input-name" placeholder="John Doe" style="padding: 6px;">
+                    </div>
+                  </div>
+                  <div class="silo-form-row">
+                    <div class="form-group">
+                      <label style="font-size:0.6rem;">Wait (sec)</label>
+                      <input type="number" class="form-input" id="db-input-wait" value="15" style="padding: 6px;">
+                    </div>
+                    <div class="form-group">
+                      <label style="font-size:0.6rem;">Channel</label>
+                      <select class="form-input" id="db-input-channel" style="padding: 6px;">
+                        <option value="voice">Voice</option>
+                        <option value="chat">Chat</option>
+                        <option value="email">Email</option>
+                      </select>
+                    </div>
+                  </div>
+                  <button class="silo-btn" id="silo-btn-add-db">Insert Row</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Silo 2: Zendesk CRM -->
+            <div class="silo-section">
+              <div class="silo-title">
+                <span>CRM Server (Zendesk Lakehouse Accounts)</span>
+                <span style="font-size: 0.7rem; font-weight: normal; color: var(--text-secondary);" id="crm-row-count">3 accounts</span>
+              </div>
+              <div class="silo-wrapper">
+                <div class="silo-table-container">
+                  <table class="silo-table">
+                    <thead>
+                      <tr><th>Customer Name</th><th>Account</th><th>Tier</th><th>Email</th><th>Active Ticket</th></tr>
+                    </thead>
+                    <tbody id="silo-crm-tbody">
+                      <!-- Rendered dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                  <!-- Form 1: Create CRM Account -->
+                  <div class="silo-form">
+                    <div class="silo-form-title">Create CRM Account</div>
+                    <div class="silo-form-row">
+                      <div class="form-group" style="flex: 1;">
+                        <label style="font-size:0.6rem;">Customer Name</label>
+                        <input type="text" class="form-input" id="crm-input-name" placeholder="Elon Musk" style="padding: 6px;">
+                      </div>
+                      <div class="form-group" style="flex: 1;">
+                        <label style="font-size:0.6rem;">Org/Account</label>
+                        <input type="text" class="form-input" id="crm-input-org" placeholder="Tesla Inc" style="padding: 6px;">
+                      </div>
+                    </div>
+                    <div class="silo-form-row">
+                      <div class="form-group" style="flex: 1;">
+                        <label style="font-size:0.6rem;">Tier</label>
+                        <select class="form-input" id="crm-input-tier" style="padding: 6px;">
+                          <option value="VIP">VIP</option>
+                          <option value="Standard">Standard</option>
+                          <option value="Basic">Basic</option>
+                        </select>
+                      </div>
+                      <div class="form-group" style="flex: 1;">
+                        <label style="font-size:0.6rem;">Email</label>
+                        <input type="email" class="form-input" id="crm-input-email" placeholder="elon@tesla.com" style="padding: 6px;">
+                      </div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 8px;">
+                      <label style="font-size:0.6rem;">Active Support Ticket</label>
+                      <input type="text" class="form-input" id="crm-input-ticket" placeholder="Ticket #8041 - Late Delivery Dispute" style="padding: 6px;">
+                    </div>
+                    <button class="silo-btn" id="silo-btn-add-crm">Add Account</button>
+                  </div>
+
+                  <!-- Form 2: Log Past Customer Interaction -->
+                  <div class="silo-form">
+                    <div class="silo-form-title">Log Past Customer Interaction</div>
+                    <div class="silo-form-row">
+                      <div class="form-group" style="flex: 1;">
+                        <label style="font-size:0.6rem;">Select Customer</label>
+                        <select class="form-input" id="interaction-input-customer" style="padding: 6px;">
+                          <!-- Populated dynamically from local CRM db -->
+                        </select>
+                      </div>
+                      <div class="form-group" style="flex: 1;">
+                        <label style="font-size:0.6rem;">Channel</label>
+                        <select class="form-input" id="interaction-input-channel" style="padding: 6px;">
+                          <option value="voice">Voice</option>
+                          <option value="chat">Chat</option>
+                          <option value="email">Email</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="silo-form-row">
+                      <div class="form-group" style="flex: 1;">
+                        <label style="font-size:0.6rem;">Agent Name</label>
+                        <input type="text" class="form-input" id="interaction-input-agent" placeholder="Agent John" value="Aura AI" style="padding: 6px;">
+                      </div>
+                      <div class="form-group" style="flex: 1;">
+                        <label style="font-size:0.6rem;">Date</label>
+                        <input type="text" class="form-input" id="interaction-input-date" value="2026-06-01" style="padding: 6px;">
+                      </div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 8px;">
+                      <label style="font-size:0.6rem;">Conversation Notes</label>
+                      <input type="text" class="form-input" id="interaction-input-notes" placeholder="Resolved billing issue. Customer pleased." style="padding: 6px;">
+                    </div>
+                    <button class="silo-btn" id="silo-btn-add-interaction">Log Interaction</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Silo 3: SharePoint Knowledge Base -->
+            <div class="silo-section" style="grid-column: 1 / -1; margin-top: 1rem;">
+              <div class="silo-title">
+                <span>SharePoint Server (Enterprise Knowledge Base Documents)</span>
+                <span style="font-size: 0.7rem; font-weight: normal; color: var(--text-secondary);" id="kb-row-count">7 documents</span>
+              </div>
+              <div class="silo-wrapper" style="grid-template-columns: 35% 65%;">
+                <div class="silo-table-container" style="max-height: 220px;">
+                  <table class="silo-table">
+                    <thead>
+                      <tr><th>Document ID</th><th>Document Title</th></tr>
+                    </thead>
+                    <tbody id="silo-kb-tbody">
+                      <!-- Rendered dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+                <div class="silo-form" style="background: rgba(255,255,255,0.015);">
+                  <div class="silo-form-title" id="kb-doc-viewer-title">Document Content Viewer</div>
+                  <div style="font-size: 0.8rem; line-height: 1.45; color: var(--text-secondary); max-height: 160px; overflow-y: auto; font-family: var(--font-sans); text-align: left;" id="kb-doc-viewer-content">
+                    Select a SharePoint document from the table on the left to inspect its raw policy text.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Tab 3: Databricks Audit Log -->
+        <div class="tab-panel" id="tab-panel-audit">
+          <div class="audit-panel">
+            <div class="audit-header">
+              <div class="audit-meta">
+                <div class="databricks-badge">Databricks Unity Catalog</div>
+                <span style="font-size: 0.8rem; color: var(--text-secondary);">Compliance Framework: HIPAA & GDPR Active</span>
+              </div>
+              <button class="toggle-btn" id="clear-audit-logs" style="padding: 4px 10px; font-size: 0.75rem;">Clear Logs</button>
+            </div>
+            
+            <!-- Real-time appending logs -->
+            <div class="audit-log-container" id="audit-log-box">
+              <div class="log-entry">
+                <span class="log-timestamp">18:59:20</span>
+                <span class="log-badge info">Gateway</span>
+                <span class="log-text">Secure gateway initialized on localhost:8080. Zero-Trust check passed.</span>
+              </div>
+              <div class="log-entry">
+                <span class="log-timestamp">18:59:20</span>
+                <span class="log-badge success">Audit</span>
+                <span class="log-text">Databricks Unity Catalog audit logs linked. Compliance policy verified for Supervisor Sarah.</span>
+              </div>
+              <div class="log-entry">
+                <span class="log-timestamp">18:59:21</span>
+                <span class="log-badge info">MCP</span>
+                <span class="log-text">Initialized server discovery list: PostgreSQL Call DB, Salesforce CRM Server, SharePoint KB Server.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </section>
+  </main>
+
+  <!-- Bottom Control Bar: Server Controller -->
+  <footer class="server-manager-panel" id="server-manager-footer">
+    <div class="manager-label">
+      <h3>Active MCP Lakehouse Integrations</h3>
+      <p>Simulating dynamic resource exposure. Toggle servers below to see them connect/disconnect from the AI's tool list.</p>
+    </div>
+    
+    <div class="server-switches">
+      <button class="server-switch active" id="server-switch-pg" data-server="postgresql_db">
+        <div class="switch-dot"></div>
+        <span>PostgreSQL Call Log DB</span>
+      </button>
+      
+      <button class="server-switch active" id="server-switch-crm" data-server="salesforce_crm">
+        <div class="switch-dot"></div>
+        <span>Zendesk Support CRM</span>
+      </button>
+      
+      <button class="server-switch active" id="server-switch-kb" data-server="sharepoint_kb">
+        <div class="switch-dot"></div>
+        <span>SharePoint Knowledge Base</span>
+      </button>
+    </div>
+  </footer>
+
+  <!-- Diagnostic UI log indicator -->
+  <div id="diagnostic-log" style="position: fixed; bottom: 80px; right: 20px; background: rgba(10,14,23,0.95); color: #DA291C; font-family: monospace; font-size: 11px; padding: 10px 16px; z-index: 9999; border: 1px solid #DA291C; border-radius: 6px; box-shadow: 0 0 15px rgba(218,41,28,0.2); pointer-events: none; font-weight: bold;">
+    Diagnostic Status: app.js has NOT executed yet
+  </div>
+
+  <!-- Include App Logic -->
+  <script src="app.js"></script>
+
+</body>
+</html>
