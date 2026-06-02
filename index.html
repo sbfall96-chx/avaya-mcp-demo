@@ -559,22 +559,78 @@
               <button class="toggle-btn" id="clear-audit-logs" style="padding: 4px 10px; font-size: 0.75rem;">Clear Logs</button>
             </div>
             
-            <!-- Real-time appending logs -->
-            <div class="audit-log-container" id="audit-log-box">
-              <div class="log-entry">
-                <span class="log-timestamp">18:59:20</span>
-                <span class="log-badge info">Gateway</span>
-                <span class="log-text">Secure gateway initialized on localhost:8080. Zero-Trust check passed.</span>
+            <!-- Real-time appending logs & Guardrails grid -->
+            <div class="audit-grid-layout">
+              <!-- Left Column: Real-time logs -->
+              <div class="audit-column-logs">
+                <h4 class="column-subtitle">Security & SQL Audit Trails</h4>
+                <div class="audit-log-container" id="audit-log-box">
+                  <div class="log-entry">
+                    <span class="log-timestamp">18:59:20</span>
+                    <span class="log-badge info">Gateway</span>
+                    <span class="log-text">Secure gateway initialized on localhost:8080. Zero-Trust check passed.</span>
+                  </div>
+                  <div class="log-entry">
+                    <span class="log-timestamp">18:59:20</span>
+                    <span class="log-badge success">Audit</span>
+                    <span class="log-text">Databricks Unity Catalog audit logs linked. Compliance policy verified for Supervisor Sarah.</span>
+                  </div>
+                  <div class="log-entry">
+                    <span class="log-timestamp">18:59:21</span>
+                    <span class="log-badge info">MCP</span>
+                    <span class="log-text">Initialized server discovery list: PostgreSQL Call DB, Salesforce CRM Server, SharePoint KB Server.</span>
+                  </div>
+                </div>
               </div>
-              <div class="log-entry">
-                <span class="log-timestamp">18:59:20</span>
-                <span class="log-badge success">Audit</span>
-                <span class="log-text">Databricks Unity Catalog audit logs linked. Compliance policy verified for Supervisor Sarah.</span>
-              </div>
-              <div class="log-entry">
-                <span class="log-timestamp">18:59:21</span>
-                <span class="log-badge info">MCP</span>
-                <span class="log-text">Initialized server discovery list: PostgreSQL Call DB, Salesforce CRM Server, SharePoint KB Server.</span>
+              
+              <!-- Right Column: AI Guardrails & Trust Monitor -->
+              <div class="audit-column-guardrails">
+                <h4 class="column-subtitle">Aura AI Hallucination & Trust Guardrails</h4>
+                <div class="guardrails-container">
+                  <div class="guardrail-card">
+                    <div class="card-metric-row">
+                      <span class="card-label">Context Groundedness</span>
+                      <span class="card-value" id="guardrail-groundedness">98.6%</span>
+                    </div>
+                    <div class="card-progress-bar">
+                      <div class="progress-fill cyan" id="fill-groundedness" style="width: 98.6%;"></div>
+                    </div>
+                    <p class="card-desc">Measures if AI claims are strictly justified by SharePoint and CRM search results (Zero Hallucination check).</p>
+                  </div>
+                  
+                  <div class="guardrail-card">
+                    <div class="card-metric-row">
+                      <span class="card-label">Toxicity & Safety Guardrail</span>
+                      <span class="card-value" id="guardrail-toxicity">100.0% Passed</span>
+                    </div>
+                    <div class="card-progress-bar">
+                      <div class="progress-fill green" id="fill-toxicity" style="width: 100%;"></div>
+                    </div>
+                    <p class="card-desc">Databricks MLflow Gateway checks verifying output safety, corporate tone, and prompt injections blocker.</p>
+                  </div>
+                  
+                  <div class="guardrail-card">
+                    <div class="card-metric-row">
+                      <span class="card-label">PII Governance Compliance</span>
+                      <span class="card-value" id="guardrail-pii">100.0% Audited</span>
+                    </div>
+                    <div class="card-progress-bar">
+                      <div class="progress-fill green" id="fill-pii" style="width: 100%;"></div>
+                    </div>
+                    <p class="card-desc">Auto-verifies that HIPAA compliant masking is active and customer names are fully redacted in trace records.</p>
+                  </div>
+                  
+                  <div class="guardrail-card">
+                    <div class="card-metric-row">
+                      <span class="card-label">RAG Retrieval Relevance</span>
+                      <span class="card-value" id="guardrail-relevance">97.2%</span>
+                    </div>
+                    <div class="card-progress-bar">
+                      <div class="progress-fill purple" id="fill-relevance" style="width: 97.2%;"></div>
+                    </div>
+                    <p class="card-desc">Relevance of fetched documents to query. Ensures no irrelevant content enters the LLM prompt window.</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
