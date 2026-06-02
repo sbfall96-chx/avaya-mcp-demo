@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Avaya Infinity MCP – Secure AI Orchestration & Analytics Control Center</title>
   <meta name="description" content="Explore Avaya Infinity powered by Model Context Protocol (MCP) and Databricks. Securely connect multiple AI models to CRM, databases, and enterprise data silos with zero friction.">
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="style.css?v=6">
   
   <!-- ChartJS CDN for live responsive analytical dashboards -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -137,13 +137,13 @@
       </div>
 
       <!-- Interactive Demo Guide Widget -->
-      <div class="demo-guide-card" id="demo-guide-widget">
+      <div class="demo-guide-card minimized" id="demo-guide-widget">
         <div class="demo-guide-header" id="demo-guide-header">
           <div class="guide-title">
             <span class="guide-icon">⚡</span>
             <span>Interactive Demo Guide (3-Step Click-Through)</span>
           </div>
-          <button class="guide-toggle-btn" id="guide-toggle-btn" aria-label="Toggle Demo Guide">Minimize</button>
+          <button class="guide-toggle-btn" id="guide-toggle-btn" aria-label="Toggle Demo Guide">Expand</button>
         </div>
         <div class="demo-guide-body" id="demo-guide-body">
           <p class="guide-intro">Orchestrate the entire live "Voice Jitter" masking and audit trail demo with a single click per step:</p>
@@ -189,38 +189,43 @@
       </div>
 
       <!-- Quick Scenarios (Supervisor Presets) -->
-      <div class="scenarios-container">
-        <h2 class="scenarios-title" id="scenario-title-label">Supervisor Presets (Mock Scenarios)</h2>
-        <div class="scenarios-grid">
-          <button class="scenario-btn" id="preset-wait-time" aria-label="Trigger Peak Wait Time Analysis">
-            <span class="tag">Analysis</span>
-            <strong>Peak Wait-Time Spike</strong>
-            <span style="font-size: 0.7rem; color: var(--text-secondary);">Cross-reference database logs to diagnose wait spike at 2 PM.</span>
-          </button>
-          
-          <button class="scenario-btn" id="preset-vip-escalate" aria-label="Trigger VIP Escalation Scenario">
-            <span class="tag">Action Dispatch</span>
-            <strong>VIP CRM Escalation</strong>
-            <span style="font-size: 0.7rem; color: var(--text-secondary);">Scan Zendesk queues and elevate priority for high-value customers.</span>
-          </button>
-          
-          <button class="scenario-btn" id="preset-agent-util" aria-label="Trigger Agent Utilization Report">
-            <span class="tag">Dashboard Gen</span>
-            <strong>Real-time Queue Volume</strong>
-            <span style="font-size: 0.7rem; color: var(--text-secondary);">Chart active queue volumes by channel & agent availability.</span>
-          </button>
-          
-          <button class="scenario-btn" id="preset-refund-policy" aria-label="Trigger Policy Search Scenario">
-            <span class="tag">Knowledge base</span>
-            <strong>Disputed Contract Policy</strong>
-            <span style="font-size: 0.7rem; color: var(--text-secondary);">Search SharePoint knowledge base for contract refund eligibility rules.</span>
-          </button>
+      <div class="scenarios-container minimized" id="scenarios-widget">
+        <div class="scenarios-header" id="scenarios-header" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.02); padding-bottom: 4px;">
+          <h2 class="scenarios-title" id="scenario-title-label" style="margin-bottom: 0;">Supervisor Presets (Mock Scenarios)</h2>
+          <button class="guide-toggle-btn" id="scenarios-toggle-btn" style="background:none; border:none; color:var(--text-secondary); font-size:0.75rem; cursor:pointer;">Expand</button>
+        </div>
+        <div class="scenarios-body" id="scenarios-body">
+          <div class="scenarios-grid">
+            <button class="scenario-btn" id="preset-wait-time" aria-label="Trigger Peak Wait Time Analysis">
+              <span class="tag">Analysis</span>
+              <strong>Peak Wait-Time Spike</strong>
+              <span style="font-size: 0.7rem; color: var(--text-secondary);">Cross-reference database logs to diagnose wait spike at 2 PM.</span>
+            </button>
+            
+            <button class="scenario-btn" id="preset-vip-escalate" aria-label="Trigger VIP Escalation Scenario">
+              <span class="tag">Action Dispatch</span>
+              <strong>VIP CRM Escalation</strong>
+              <span style="font-size: 0.7rem; color: var(--text-secondary);">Scan Zendesk queues and elevate priority for high-value customers.</span>
+            </button>
+            
+            <button class="scenario-btn" id="preset-agent-util" aria-label="Trigger Agent Utilization Report">
+              <span class="tag">Dashboard Gen</span>
+              <strong>Real-time Queue Volume</strong>
+              <span style="font-size: 0.7rem; color: var(--text-secondary);">Chart active queue volumes by channel & agent availability.</span>
+            </button>
+            
+            <button class="scenario-btn" id="preset-refund-policy" aria-label="Trigger Policy Search Scenario">
+              <span class="tag">Knowledge base</span>
+              <strong>Disputed Contract Policy</strong>
+              <span style="font-size: 0.7rem; color: var(--text-secondary);">Search SharePoint knowledge base for contract refund eligibility rules.</span>
+            </button>
 
-          <button class="scenario-btn" id="preset-churn-retention" aria-label="Trigger Churn Prevention Scenario">
-            <span class="tag">Retention Save</span>
-            <strong>Dynamic Churn Save</strong>
-            <span style="font-size: 0.7rem; color: var(--text-secondary);">Lookup high-risk churn profiles and authorize retention service credit discounts.</span>
-          </button>
+            <button class="scenario-btn" id="preset-churn-retention" aria-label="Trigger Churn Prevention Scenario">
+              <span class="tag">Retention Save</span>
+              <strong>Dynamic Churn Save</strong>
+              <span style="font-size: 0.7rem; color: var(--text-secondary);">Lookup high-risk churn profiles and authorize retention service credit discounts.</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -677,7 +682,7 @@
   </div>
 
   <!-- Include App Logic -->
-  <script src="app.js?v=5"></script>
+  <script src="app.js?v=6"></script>
 
 </body>
 </html>

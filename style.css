@@ -1895,6 +1895,18 @@ input:checked + .slider:before {
   line-height: 1.3;
 }
 
+/* Collapsible Presets Widget */
+.scenarios-container.minimized .scenarios-body {
+  display: none;
+}
+.scenarios-container.minimized {
+  padding: 0.5rem 1.5rem;
+}
+.scenarios-container.minimized #scenarios-header {
+  margin-bottom: 0 !important;
+}
+
+
 
 
 

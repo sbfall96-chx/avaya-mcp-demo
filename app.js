@@ -979,6 +979,22 @@ async function handleSendMessage(presetKey = null) {
   }
 
   chatInputField.value = '';
+  
+  // Auto-minimize Guide and Presets to maximize vertical space for results
+  const guideWidgetEl = document.getElementById('demo-guide-widget');
+  const guideToggleBtnEl = document.getElementById('guide-toggle-btn');
+  if (guideWidgetEl && !guideWidgetEl.classList.contains('minimized')) {
+    guideWidgetEl.classList.add('minimized');
+    if (guideToggleBtnEl) guideToggleBtnEl.innerText = 'Expand';
+  }
+
+  const scenariosWidgetEl = document.getElementById('scenarios-widget');
+  const scenariosToggleBtnEl = document.getElementById('scenarios-toggle-btn');
+  if (scenariosWidgetEl && !scenariosWidgetEl.classList.contains('minimized')) {
+    scenariosWidgetEl.classList.add('minimized');
+    if (scenariosToggleBtnEl) scenariosToggleBtnEl.innerText = 'Expand';
+  }
+
   state.isGenerating = true;
 
   // Trigger guardrails animation
@@ -2689,6 +2705,29 @@ function switchSession(selected) {
       });
     }
     if (toggleBtn) toggleBtn.addEventListener('click', toggleMinimize);
+    
+    // Collapsible Presets Widget Logic
+    const scenariosWidget = document.getElementById('scenarios-widget');
+    const scenariosHeader = document.getElementById('scenarios-header');
+    const scenariosToggleBtn = document.getElementById('scenarios-toggle-btn');
+    
+    const togglePresets = () => {
+      if (scenariosWidget) {
+        scenariosWidget.classList.toggle('minimized');
+        if (scenariosToggleBtn) {
+          scenariosToggleBtn.innerText = scenariosWidget.classList.contains('minimized') ? 'Expand' : 'Minimize';
+        }
+      }
+    };
+    
+    if (scenariosHeader) {
+      scenariosHeader.addEventListener('click', (e) => {
+        if (e.target !== scenariosToggleBtn) {
+          togglePresets();
+        }
+      });
+    }
+    if (scenariosToggleBtn) scenariosToggleBtn.addEventListener('click', togglePresets);
     
     if (btnStep1) {
       btnStep1.addEventListener('click', () => {
