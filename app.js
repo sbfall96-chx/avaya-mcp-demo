@@ -460,33 +460,45 @@ const tabExplainers = {
 };
 
 function updateTabExplainer(target) {
-  const banner = document.getElementById('tab-explainer-banner');
-  const badge = document.getElementById('explainer-badge');
-  const title = document.getElementById('explainer-title');
-  const desc = document.getElementById('explainer-desc');
-  const valText = document.getElementById('explainer-value-text');
-  
-  if (!banner || !badge || !title || !desc || !valText) return;
-  
-  const info = tabExplainers[target];
-  if (!info) return;
-  
-  badge.innerText = info.badge;
-  title.innerText = info.title;
-  desc.innerText = info.desc;
-  valText.innerText = info.value;
-  
-  badge.style.color = info.color;
-  badge.style.background = info.bg;
-  banner.style.borderLeftColor = info.color;
-  
-  // Subtle animation
-  banner.style.transform = 'scale(0.99)';
-  banner.style.opacity = '0.85';
-  setTimeout(() => {
-    banner.style.transform = 'scale(1)';
-    banner.style.opacity = '1';
-  }, 100);
+  try {
+    const banner = document.getElementById('tab-explainer-banner');
+    const badge = document.getElementById('explainer-badge');
+    const title = document.getElementById('explainer-title');
+    const desc = document.getElementById('explainer-desc');
+    const valText = document.getElementById('explainer-value-text');
+    
+    if (!banner || !badge || !title || !desc || !valText) {
+      console.warn("Dynamic banner: One or more DOM elements were null.", { banner, badge, title, desc, valText });
+      return;
+    }
+    
+    const info = tabExplainers[target];
+    if (!info) {
+      console.warn("Dynamic banner: No explainer configuration for target", target);
+      return;
+    }
+    
+    console.log("Updating tab explainer banner for target:", target, info);
+    
+    badge.innerText = info.badge;
+    title.innerText = info.title;
+    desc.innerText = info.desc;
+    valText.innerText = info.value;
+    
+    badge.style.color = info.color;
+    badge.style.background = info.bg;
+    banner.style.borderLeftColor = info.color;
+    
+    // Subtle animation
+    banner.style.transform = 'scale(0.99)';
+    banner.style.opacity = '0.85';
+    setTimeout(() => {
+      banner.style.transform = 'scale(1)';
+      banner.style.opacity = '1';
+    }, 100);
+  } catch (err) {
+    console.error("Error updating tab explainer banner:", err);
+  }
 }
 
 function switchTab(target) {
