@@ -2675,30 +2675,31 @@ function switchSession(selected) {
             addAuditLog('success', 'Demo Guide', 'Interactive Walkthrough Completed successfully! All security validations passed.');
             
             const resetBtn = document.createElement('button');
-          resetBtn.className = 'guide-action-btn';
-          resetBtn.style.marginTop = '10px';
-          resetBtn.innerText = 'Reset Demo Guide';
-          resetBtn.addEventListener('click', () => {
-            if (step1Col) step1Col.className = 'guide-step-col active';
-            if (step2Col) step2Col.className = 'guide-step-col';
-            if (step3Col) step3Col.className = 'guide-step-col';
-            
-            btnStep1.innerText = 'Enable Masking';
-            btnStep1.disabled = false;
-            
-            btnStep2.innerText = 'Run Query';
-            btnStep2.disabled = true;
-            
-            btnStep3.innerText = 'Inspect Audit';
-            btnStep3.disabled = true;
-            
-            if (govToggleHipaa) govToggleHipaa.checked = false;
-            if (settingsSaveBtn) settingsSaveBtn.click();
-            
-            resetBtn.remove();
-          });
-          if (guideBody) guideBody.appendChild(resetBtn);
-        }, 500);
+            resetBtn.className = 'guide-action-btn';
+            resetBtn.style.marginTop = '10px';
+            resetBtn.innerText = 'Reset Demo Guide';
+            resetBtn.addEventListener('click', () => {
+              if (step1Col) step1Col.className = 'guide-step-col active';
+              if (step2Col) step2Col.className = 'guide-step-col';
+              if (step3Col) step3Col.className = 'guide-step-col';
+              
+              btnStep1.innerText = 'Enable Masking';
+              btnStep1.disabled = false;
+              
+              btnStep2.innerText = 'Run Query';
+              btnStep2.disabled = true;
+              
+              btnStep3.innerText = 'Inspect Audit';
+              btnStep3.disabled = true;
+              
+              if (govToggleHipaa) govToggleHipaa.checked = false;
+              if (settingsSaveBtn) settingsSaveBtn.click();
+              
+              resetBtn.remove();
+            });
+            if (guideBody) guideBody.appendChild(resetBtn);
+          }, 500);
+        }, 1500);
       });
     }
     
