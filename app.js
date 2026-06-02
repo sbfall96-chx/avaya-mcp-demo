@@ -963,6 +963,7 @@ async function handleSendMessage(presetKey = null) {
     else if (presetKey === 'preset-vip-escalate') userText = 'Check for any VIP accounts in Zendesk with active calls, and raise their queue priority if wait times exceed 2 minutes.';
     else if (presetKey === 'preset-agent-util') userText = 'Create an interactive dashboard of active call volume by channel (Voice vs. Chat) and check active agent status.';
     else if (presetKey === 'preset-refund-policy') userText = 'A customer wants a refund on a disputed contract. Check our SharePoint Knowledge Base for the refund eligibility policy.';
+    else if (presetKey === 'preset-churn-retention') userText = 'Jeff Edwards is threatening to cancel service due to high pricing, check his CRM account profile value and search policies for discount offering rules.';
   } else {
     userText = chatInputField.value.trim();
     if (!userText) return;
@@ -973,6 +974,7 @@ async function handleSendMessage(presetKey = null) {
     else if (lText.includes('vip') || lText.includes('escalate')) activePresetKey = 'preset-vip-escalate';
     else if (lText.includes('queue') || lText.includes('channel') || lText.includes('volume')) activePresetKey = 'preset-agent-util';
     else if (lText.includes('refund') || lText.includes('policy') || lText.includes('contract')) activePresetKey = 'preset-refund-policy';
+    else if (lText.includes('cancel') || lText.includes('churn') || lText.includes('retention') || lText.includes('discount')) activePresetKey = 'preset-churn-retention';
     else if (lText.includes('how many') || lText.includes('incoming') || lText.includes('caller') || lText.includes('who')) activePresetKey = 'preset-incoming-calls';
   }
 
@@ -1252,6 +1254,65 @@ async function runSimulatedToolLoop(presetKey, userText) {
           
           <p>**Resolution Recommendation:**</p>
           <p>Verify caller contract parameters. If billing errors representing >5% are confirmed, request case filing under 14 days limitation.</p>
+        `;
+      },
+      render: () => {}
+    },
+    'preset-churn-retention': {
+      requiredServers: ['salesforce_crm', 'sharepoint_kb'],
+      steps: [
+        {
+          title: 'Query CRM Support Profile: J*** E***',
+          tag: 'salesforce_crm/get_customer_interaction_history',
+          desc: 'Retrieve active contract value, lifetime billing history, and calculated churn risk markers.',
+          payload: { customer_name: 'Jeff Edwards' },
+          execute: () => mcpTools.get_customer_interaction_history({ customer_name: 'Jeff Edwards' })
+        },
+        {
+          title: 'Search SharePoint KB: "retention guidelines"',
+          tag: 'sharepoint_kb/search',
+          desc: 'Query company policy handbook for customer retention discount credit authorization levels.',
+          payload: { query: 'retention policy discounts' },
+          execute: () => mcpTools.sharepoint_kb_search({ query: 'retention' })
+        }
+      ],
+      generate: () => {
+        const targetName = 'Jeff Edwards';
+        return `
+          <p>I have queried your **Zendesk CRM** and **SharePoint Knowledge Base** via MCP tools to resolve the churn retention request:</p>
+          
+          <div class="dashboard-grid">
+            <div class="dash-card">
+              <h4>Customer Churn Profile</h4>
+              <p class="alert" style="color: var(--color-yellow); border-color: rgba(245, 158, 11, 0.2); margin-top: 4px; padding: 2px 6px; font-size: 0.7rem; border-radius: 4px; display: inline-block;">Risk: High (84%)</p>
+              <div style="font-size:0.75rem; color:var(--text-secondary); line-height:1.45; margin-top:8px;">
+                Customer: <strong>${maskText(targetName)}</strong><br>
+                Contract Value: <strong>$8,400 / yr</strong><br>
+                Zendesk Ticket: <strong>#9842 - Pricing Dispute</strong>
+              </div>
+            </div>
+            <div class="dash-card">
+              <h4>SharePoint Policy Rule</h4>
+              <p style="color: var(--color-green); font-size: 0.7rem; border: 1px solid rgba(16, 185, 129, 0.2); background: rgba(16, 185, 129, 0.05); padding: 2px 6px; border-radius: 4px; display: inline-block; font-weight: 600; margin-top: 4px;">SOP-Retention-409</p>
+              <div style="font-size:0.7rem; color:var(--text-muted); line-height:1.4; margin-top:8px;">
+                "For active enterprise contract values > $5,000 and churn risk indices exceeding 70%, agents are authorized to offer a service credit discount up to 20% ($1,680 limit) upon approval."
+              </div>
+            </div>
+          </div>
+          
+          <div class="tandem-card" id="tandem-auth-card">
+            <div class="tandem-header">
+              <span class="tandem-title">🤝 Tandem Care Checkpoint</span>
+              <span class="tandem-badge">Awaiting Authorization</span>
+            </div>
+            <div class="tandem-body">
+              Aura AI proposes executing <code>salesforce_crm/apply_retention_discount</code> to issue a 15% contract billing credit ($1,260 value) to <strong>${maskText(targetName)}</strong>'s active account.
+            </div>
+            <div class="tandem-footer">
+              <button class="tandem-btn decline" onclick="handleTandemDecline('${targetName}')">Decline Offer</button>
+              <button class="tandem-btn approve" onclick="handleTandemApprove('${targetName}')">Authorize Credit</button>
+            </div>
+          </div>
         `;
       },
       render: () => {}
@@ -2133,14 +2194,31 @@ window.handleTandemApprove = function(customerName) {
   const card = document.getElementById('tandem-auth-card');
   if (!card) return;
   
+  if (customerName === 'Jeff Edwards') {
+    card.className = 'tandem-card authorized';
+    card.querySelector('.tandem-badge').innerText = 'Authorized';
+    
+    card.querySelector('.tandem-body').innerHTML = `
+      <strong>Action Dispatched:</strong> Retention service credit (15% billing discount) was authorized by Supervisor Sarah. Rerouting tool call <code>salesforce_crm/apply_retention_discount</code> executed against Unity Catalog catalog permissions.
+    `;
+    card.querySelector('.tandem-footer').style.display = 'none';
+    
+    addAuditLog('success', 'Tandem', `Supervisor Sarah authorized a 15% service credit discount for customer: Jeff Edwards`);
+    
+    triggerArchVisualTransmission('salesforce_crm/apply_retention_discount');
+    
+    setTimeout(() => {
+      appendMessage('assistant', `I have successfully updated the CRM record for **${maskText('Jeff Edwards')}** and applied a 15% monthly billing discount to prevent account cancellation. The Databricks compliance audit log has been updated.`, 'A');
+    }, 1500);
+    return;
+  }
+  
   card.className = 'tandem-card authorized';
   card.querySelector('.tandem-badge').innerText = 'Authorized';
   
-  // Find all VIPs currently in queue
   const res = mcpTools.search_vip_queues({ max_wait_sec: 120 });
   const vips = res.active_vip_waiting;
   
-  // Format names list: "Marcus Sterling, Dr. Evelyn Carter, and Jeff Edwards"
   let namesStr = '';
   if (vips.length === 1) {
     namesStr = `**${vips[0].name}**`;
@@ -2160,7 +2238,6 @@ window.handleTandemApprove = function(customerName) {
   
   addAuditLog('success', 'Tandem', `Supervisor Sarah authorized queue escalation for customer(s): ${vips.map(v => v.name).join(', ')}`);
   
-  // Flash visual transmission
   triggerArchVisualTransmission('salesforce_crm/escalate_priority');
   
   setTimeout(() => {
@@ -2171,6 +2248,23 @@ window.handleTandemApprove = function(customerName) {
 window.handleTandemDecline = function(customerName) {
   const card = document.getElementById('tandem-auth-card');
   if (!card) return;
+  
+  if (customerName === 'Jeff Edwards') {
+    card.className = 'tandem-card declined';
+    card.querySelector('.tandem-badge').innerText = 'Declined';
+    
+    card.querySelector('.tandem-body').innerHTML = `
+      <strong>Action Blocked:</strong> Retention service credit discount declined by Supervisor Sarah. No discount terms have been added.
+    `;
+    card.querySelector('.tandem-footer').style.display = 'none';
+    
+    addAuditLog('warning', 'Tandem', `Supervisor Sarah declined the retention discount offer for customer: Jeff Edwards`);
+    
+    setTimeout(() => {
+      appendMessage('assistant', `Understood. The retention service credit discount for **${maskText('Jeff Edwards')}** was declined. I will notify the account manager to initiate standard cancellation procedures.`, 'A');
+    }, 1000);
+    return;
+  }
   
   card.className = 'tandem-card declined';
   card.querySelector('.tandem-badge').innerText = 'Declined';
@@ -2307,7 +2401,8 @@ window.onload = () => {
       'preset-wait-time': 'preset-wait-time',
       'preset-vip-escalate': 'preset-vip-escalate',
       'preset-agent-util': 'preset-agent-util',
-      'preset-refund-policy': 'preset-refund-policy'
+      'preset-refund-policy': 'preset-refund-policy',
+      'preset-churn-retention': 'preset-churn-retention'
     };
     
     Object.keys(binds).forEach(id => {
