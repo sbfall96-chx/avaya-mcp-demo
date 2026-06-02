@@ -2425,6 +2425,138 @@ function switchSession(selected) {
 
     resizeCanvas();
     
+    // ----------------------------------------------------
+    // Interactive Demo Walkthrough Guide Logic
+    // ----------------------------------------------------
+    const guideWidget = document.getElementById('demo-guide-widget');
+    const guideHeader = document.getElementById('demo-guide-header');
+    const guideBody = document.getElementById('demo-guide-body');
+    const toggleBtn = document.getElementById('guide-toggle-btn');
+    
+    const step1Col = document.getElementById('guide-step-col-1');
+    const step2Col = document.getElementById('guide-step-col-2');
+    const step3Col = document.getElementById('guide-step-col-3');
+    
+    const btnStep1 = document.getElementById('guide-btn-step1');
+    const btnStep2 = document.getElementById('guide-btn-step2');
+    const btnStep3 = document.getElementById('guide-btn-step3');
+    
+    const toggleMinimize = () => {
+      if (guideWidget) {
+        guideWidget.classList.toggle('minimized');
+        if (toggleBtn) {
+          toggleBtn.innerText = guideWidget.classList.contains('minimized') ? 'Expand' : 'Minimize';
+        }
+      }
+    };
+    
+    if (guideHeader) {
+      guideHeader.addEventListener('click', (e) => {
+        if (e.target !== toggleBtn) {
+          toggleMinimize();
+        }
+      });
+    }
+    if (toggleBtn) toggleBtn.addEventListener('click', toggleMinimize);
+    
+    if (btnStep1) {
+      btnStep1.addEventListener('click', () => {
+        if (settingsModal) settingsModal.classList.add('active');
+        
+        setTimeout(() => {
+          if (govToggleHipaa) govToggleHipaa.checked = true;
+          
+          setTimeout(() => {
+            if (settingsSaveBtn) settingsSaveBtn.click();
+            
+            if (step1Col) {
+              step1Col.classList.remove('active');
+              step1Col.classList.add('completed');
+            }
+            btnStep1.innerText = '✓ Masked';
+            btnStep1.disabled = true;
+            
+            if (step2Col) step2Col.classList.add('active');
+            if (btnStep2) btnStep2.disabled = false;
+            
+            addAuditLog('info', 'Demo Guide', 'PII HIPAA Data Masking auto-enabled by tutorial guide.');
+          }, 1000);
+        }, 800);
+      });
+    }
+    
+    if (btnStep2) {
+      btnStep2.addEventListener('click', () => {
+        if (chatInputField) chatInputField.value = "Jeff Edwards is complaining about voice jitter, check his ticket and search policies for troubleshooting rules.";
+        if (chatSendBtn) chatSendBtn.click();
+        
+        if (step2Col) {
+          step2Col.classList.remove('active');
+          step2Col.classList.add('completed');
+        }
+        btnStep2.innerText = '✓ Submitted';
+        btnStep2.disabled = true;
+        
+        if (step3Col) step3Col.classList.add('active');
+        if (btnStep3) btnStep3.disabled = false;
+        
+        addAuditLog('info', 'Demo Guide', 'Prompt submitted. Trace switches to Live Protocol Trace.');
+      });
+    }
+    
+    if (btnStep3) {
+      btnStep3.addEventListener('click', () => {
+        switchTab('audit');
+        
+        if (step3Col) {
+          step3Col.classList.remove('active');
+          step3Col.classList.add('completed');
+        }
+        btnStep3.innerText = '✓ Done';
+        btnStep3.disabled = true;
+        
+        if (auditLogBox) {
+          auditLogBox.style.outline = '2px solid var(--color-cyan)';
+          auditLogBox.style.boxShadow = '0 0 20px rgba(0, 240, 255, 0.4)';
+          setTimeout(() => {
+            auditLogBox.style.outline = 'none';
+            auditLogBox.style.boxShadow = 'none';
+          }, 3000);
+        }
+        
+        setTimeout(() => {
+          addAuditLog('success', 'Demo Guide', 'Interactive Walkthrough Completed successfully! All security validations passed.');
+          
+          const resetBtn = document.createElement('button');
+          resetBtn.className = 'guide-action-btn';
+          resetBtn.style.marginTop = '10px';
+          resetBtn.innerText = 'Reset Demo Guide';
+          resetBtn.addEventListener('click', () => {
+            if (step1Col) step1Col.className = 'guide-step-col active';
+            if (step2Col) step2Col.className = 'guide-step-col';
+            if (step3Col) step3Col.className = 'guide-step-col';
+            
+            btnStep1.innerText = 'Enable Masking';
+            btnStep1.disabled = false;
+            
+            btnStep2.innerText = 'Run Query';
+            btnStep2.disabled = true;
+            
+            btnStep3.innerText = 'Inspect Audit';
+            btnStep3.disabled = true;
+            
+            if (govToggleHipaa) govToggleHipaa.checked = false;
+            if (settingsSaveBtn) settingsSaveBtn.click();
+            
+            resetBtn.remove();
+          });
+          if (guideBody) guideBody.appendChild(resetBtn);
+        }, 500);
+      });
+    }
+    
+    resizeCanvas();
+    
     // Update diagnostic indicator on successful setup
     const diag = document.getElementById('diagnostic-log');
     if (diag) {

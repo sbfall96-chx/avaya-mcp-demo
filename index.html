@@ -132,6 +132,46 @@
         </div>
       </div>
 
+      <!-- Interactive Demo Guide Widget -->
+      <div class="demo-guide-card" id="demo-guide-widget">
+        <div class="demo-guide-header" id="demo-guide-header">
+          <div class="guide-title">
+            <span class="guide-icon">⚡</span>
+            <span>Interactive Demo Guide (3-Step Click-Through)</span>
+          </div>
+          <button class="guide-toggle-btn" id="guide-toggle-btn" aria-label="Toggle Demo Guide">Minimize</button>
+        </div>
+        <div class="demo-guide-body" id="demo-guide-body">
+          <p class="guide-intro">Orchestrate the entire live "Voice Jitter" masking and audit trail demo with a single click per step:</p>
+          <div class="guide-steps-grid">
+            <div class="guide-step-col active" id="guide-step-col-1">
+              <div class="step-header">
+                <span class="step-badge">Step 1</span>
+                <strong>PII Masking</strong>
+              </div>
+              <p class="step-desc">Enable HIPAA compliance masking for patient/customer data.</p>
+              <button class="guide-action-btn" id="guide-btn-step1">Enable Masking</button>
+            </div>
+            <div class="guide-step-col" id="guide-step-col-2">
+              <div class="step-header">
+                <span class="step-badge">Step 2</span>
+                <strong>Run Query</strong>
+              </div>
+              <p class="step-desc">Query Zendesk & SharePoint KB for Jeff Edwards.</p>
+              <button class="guide-action-btn" id="guide-btn-step2" disabled>Run Query</button>
+            </div>
+            <div class="guide-step-col" id="guide-step-col-3">
+              <div class="step-header">
+                <span class="step-badge">Step 3</span>
+                <strong>Audit Log</strong>
+              </div>
+              <p class="step-desc">Verify secure Databricks Unity Catalog audit logs.</p>
+              <button class="guide-action-btn" id="guide-btn-step3" disabled>Inspect Audit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Chat History -->
       <div class="chat-history" id="chat-history-list">
         <!-- AI Greeting -->
