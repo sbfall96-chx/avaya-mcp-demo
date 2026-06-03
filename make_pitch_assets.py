@@ -479,9 +479,9 @@ def generate_pptx():
 
 
 # =========================================================================
-# PART 2: PDF BRIEF GENERATOR (ReportLab)
+# PART 2: SOLUTIONS BRIEF PDF GENERATOR (ReportLab)
 # =========================================================================
-def generate_pdf():
+def generate_brief_pdf():
     pdf_filename = "Avaya_Infinity_MCP_Executive_Brief.pdf"
     doc = SimpleDocTemplate(
         pdf_filename,
@@ -591,7 +591,7 @@ def generate_pdf():
          Paragraph("Legacy Point-to-Point Connectors", bold_body_style), 
          Paragraph("Avaya Infinity MCP Bus Architecture", bold_body_style)],
         [Paragraph("Annual TCO", body_style), Paragraph("$150,000 / year in developer maintenance", body_style), Paragraph("$15,000 / year (90% maintenance cost savings)", body_style)],
-        [Paragraph("Deployment Speed", body_style), Paragraph("4 Months per enterprise data repository", body_style), Paragraph("2 Hours plug-and-play client-server setup", body_style)],
+        [Paragraph("Deployment Speed", body_style), Paragraph("4 Months per data repository", body_style), Paragraph("2 Hours plug-and-play client-server setup", body_style)],
         [Paragraph("Security Policy Scope", body_style), Paragraph("High Risk (Static files, scattered API tokens)", body_style), Paragraph("Protected (Centralized zero-trust API gateway)", body_style)],
         [Paragraph("Integration Bus", body_style), Paragraph("N x M bespoke integration wrappers", body_style), Paragraph("N + M unified schemas exposed to models", body_style)]
     ]
@@ -627,7 +627,7 @@ def generate_pdf():
         [Paragraph("Scenario Preset", bold_body_style), Paragraph("Aura AI Tool Action", bold_body_style), Paragraph("Quantified Outcome & ROI", bold_body_style)],
         [
             Paragraph("<b>Queue Recovery Spike</b>", body_style), 
-            Paragraph("Queries active schedules via Postgres & Zendesk CRM; blocks training conflicts; reroutes chat loads.", body_style), 
+            Paragraph("Queries active schedules via Postgres & Zendesk CRM; blocks training conflicts; redirects chat loads.", body_style), 
             Paragraph("Wait times cut from 185s to 15s. Prevented <b>$3,200/day</b> in SLA penalties.", body_style)
         ],
         [
@@ -638,7 +638,7 @@ def generate_pdf():
         [
             Paragraph("<b>Retention Discount Policy</b>", body_style), 
             Paragraph("Queries SharePoint policy documents; applies SOP-Finance-204 coupons; inserts updated records.", body_style), 
-            Paragraph("Authorized $1,260 retention credit, saving <b>$8,400 contract value</b> (6.6x ROI relative to CAC).", body_style)
+            Paragraph("Applied $1,260 credit, saving <b>$8,400 contract value</b> (6.6x ROI relative to CAC).", body_style)
         ]
     ]
     
@@ -657,6 +657,319 @@ def generate_pdf():
     doc.build(story)
     print("Executive Brief PDF generated: Avaya_Infinity_MCP_Executive_Brief.pdf")
 
+
+# =========================================================================
+# PART 3: PRESENTATION SLIDE DECK PDF GENERATOR (ReportLab Landscape)
+# =========================================================================
+def generate_deck_pdf():
+    pdf_filename = "Avaya_Infinity_MCP_Pitch_Deck.pdf"
+    
+    # 16:9 ratio landscape dimensions in points
+    slide_width = 13.333 * 72
+    slide_height = 7.5 * 72
+    
+    doc = SimpleDocTemplate(
+        pdf_filename,
+        pagesize=(slide_width, slide_height),
+        rightMargin=54,
+        leftMargin=54,
+        topMargin=54,
+        bottomMargin=54
+    )
+    
+    styles = getSampleStyleSheet()
+    
+    # Theme colors
+    bg_color = colors.HexColor('#0A0E17')
+    avaya_red = colors.HexColor('#DA291C')
+    light_gray = colors.HexColor('#F3F4F6')
+    text_muted = colors.HexColor('#9CA3AF')
+    cyan_glow = colors.HexColor('#00F0FF')
+    green_roi = colors.HexColor('#10B981')
+    yellow_warn = colors.HexColor('#F59E0B')
+    
+    # Custom styles
+    slide_title_style = ParagraphStyle(
+        'SlideTitle',
+        parent=styles['Heading1'],
+        fontName='Helvetica-Bold',
+        fontSize=36,
+        leading=42,
+        textColor=avaya_red,
+        spaceAfter=8
+    )
+    
+    slide_subtitle_style = ParagraphStyle(
+        'SlideSubtitle',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=18,
+        leading=22,
+        textColor=light_gray,
+        spaceAfter=25
+    )
+    
+    header_style = ParagraphStyle(
+        'SlideHeader',
+        parent=styles['Heading2'],
+        fontName='Helvetica-Bold',
+        fontSize=24,
+        leading=28,
+        textColor=light_gray,
+        spaceAfter=4,
+        keepWithNext=True
+    )
+    
+    subheader_style = ParagraphStyle(
+        'SlideSubheader',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=12,
+        leading=16,
+        textColor=cyan_glow,
+        spaceAfter=15
+    )
+    
+    col_title_style = ParagraphStyle(
+        'ColTitle',
+        parent=styles['Heading3'],
+        fontName='Helvetica-Bold',
+        fontSize=16,
+        leading=20,
+        textColor=light_gray,
+        spaceAfter=8
+    )
+    
+    col_text_style = ParagraphStyle(
+        'ColText',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=11,
+        leading=15,
+        textColor=text_muted,
+        spaceAfter=8
+    )
+    
+    bold_cyan_style = ParagraphStyle(
+        'BoldCyan',
+        parent=col_text_style,
+        fontName='Helvetica-Bold',
+        textColor=cyan_glow
+    )
+    
+    bold_red_style = ParagraphStyle(
+        'BoldRed',
+        parent=col_text_style,
+        fontName='Helvetica-Bold',
+        textColor=avaya_red
+    )
+    
+    bold_green_style = ParagraphStyle(
+        'BoldGreen',
+        parent=col_text_style,
+        fontName='Helvetica-Bold',
+        textColor=green_roi
+    )
+    
+    story = []
+    
+    # Background callback
+    def draw_bg(canvas, doc):
+        canvas.saveState()
+        canvas.setFillColor(bg_color)
+        canvas.rect(0, 0, slide_width, slide_height, fill=True, stroke=False)
+        canvas.restoreState()
+        
+    # Slide 1: Title
+    story.append(Spacer(1, 100))
+    story.append(Paragraph("AVAYA INFINITY MCP CONSOLE", slide_title_style))
+    story.append(Paragraph("Solutions Consultant Technical Demo & Presentation", slide_subtitle_style))
+    story.append(Spacer(1, 20))
+    story.append(Paragraph("<font color='#9CA3AF'>A technical deep-dive into why I built this application, what it shows under the hood,<br/>and how it directly demonstrates the business value of Avaya's actual Infinity roadmap.</font>", col_text_style))
+    story.append(Spacer(1, 40))
+    story.append(Paragraph("<b>Presented by: Solutions Consultant Candidate</b>", bold_cyan_style))
+    story.append(PageBreak())
+    
+    # Slide 2: Why I Built This Application
+    story.append(Paragraph("Why I Built This Application: SC Perspective", header_style))
+    story.append(Paragraph("Bridging Abstract Architecture with Quantifiable C-Suite Value", subheader_style))
+    story.append(Spacer(1, 10))
+    
+    col1 = [
+        Paragraph("The Engineering & Demo Imperative", col_title_style),
+        Paragraph("• <b>To 'Show, Not Just Tell':</b> Standardized protocol frameworks like Model Context Protocol (MCP) and Lakehouses are abstract concepts. I built this console to make them visual, interactive, and immediately understandable to C-level buyers.", col_text_style),
+        Paragraph("• <b>Sales Enablement Focused:</b> Created a client-ready playground that functions offline (perfect for situations with spotty network coverage) or connects directly to live AI APIs for real tool-calling validation.", col_text_style),
+        Paragraph("• <b>Realistic Scenario Sandbox:</b> Includes pre-configured incident presets (wait-time spikes, churn escalations) that sales engineering teams can run in real-time to walk clients through day-in-the-life contact center challenges.", col_text_style),
+    ]
+    col2 = [
+        Paragraph("Interview Alignment & Technical Rigor", bold_cyan_style),
+        Paragraph("✔ <b>Demonstrating SC Competencies:</b> Proves my ability to architect a full-stack dashboard, model complex database nodes, implement visual analytics (Chart.js), and code responsive CSS layouts.", col_text_style),
+        Paragraph("✔ <b>Strategic Solution Strategy:</b> Directly showcases my grasp of Avaya's product portfolio—highlighting the value proposition of AXP cloud telemetry and ACM core media layers.", col_text_style),
+        Paragraph("✔ <b>Interactive Value Pitch:</b> Designed specifically to address Carlos and other sales leaders' target needs—focusing on ROI calculators, compliance controls, and SLA penalty mitigations.", col_text_style),
+    ]
+    
+    t_s2 = Table([[col1, col2]], colWidths=[5.5*inch, 5.5*inch])
+    t_s2.setStyle(TableStyle([
+        ('VALIGN', (0,0), (-1,-1), 'TOP'),
+        ('RIGHTPADDING', (0,0), (0,0), 20),
+        ('LEFTPADDING', (1,0), (1,0), 20),
+    ]))
+    story.append(t_s2)
+    story.append(PageBreak())
+    
+    # Slide 3: What the Application Actually Shows
+    story.append(Paragraph("What the Application Actually Shows", header_style))
+    story.append(Paragraph("An Interactive Guided Tour of the Core Modules Built", subheader_style))
+    story.append(Spacer(1, 10))
+    
+    grid1 = [
+        Paragraph("1. Live Protocol Trace (The 'How')", bold_cyan_style),
+        Paragraph("Provides step-by-step transparency. It captures raw JSON inputs, tool schemas, and output payloads exchanged between the model client and MCP database servers, demystifying AI decision logic.", col_text_style),
+        Spacer(1, 20),
+        Paragraph("3. Interactive Network Playground (The 'Why')", bold_green_style),
+        Paragraph("Animates active connection lines and flowing data packets. Instantly models legacy integration mess (N x M spaghetti) vs the clean unified bus (N + M MCP) and Edify policy routing layouts.", col_text_style),
+    ]
+    grid2 = [
+        Paragraph("2. Unified Lakehouse & Silos (The 'What')", col_title_style),
+        Paragraph("Visualizes simulated CRM profiles, SQL database logs, and SharePoint Knowledge Base tables. Proves that models can retrieve siloed customer data without copying or duplicating data repositories.", col_text_style),
+        Spacer(1, 20),
+        Paragraph("4. Databricks Governance Log (The 'Security')", bold_red_style),
+        Paragraph("Logs compliance activities in real-time. Highlights PII redactions, RBAC access blocks, and logs all gateway actions directly into Unity Catalog audit tables for total transparency.", col_text_style),
+    ]
+    
+    t_s3 = Table([[grid1, grid2]], colWidths=[5.5*inch, 5.5*inch])
+    t_s3.setStyle(TableStyle([
+        ('VALIGN', (0,0), (-1,-1), 'TOP'),
+        ('RIGHTPADDING', (0,0), (0,0), 20),
+        ('LEFTPADDING', (1,0), (1,0), 20),
+    ]))
+    story.append(t_s3)
+    story.append(PageBreak())
+
+    # Slide 4: How It Represents Avaya's Actual Infinity
+    story.append(Paragraph("How It Represents Avaya's Actual Infinity", header_style))
+    story.append(Paragraph("Translating Architecture Guidelines to Interactive Solutions", subheader_style))
+    story.append(Spacer(1, 10))
+    
+    col1_s4 = [
+        Paragraph("Core Infrastructure Pillars", col_title_style),
+        Paragraph("• <b>AI-Agnostic BYOAI Framework:</b> In the UI, the operator can switch AI models seamlessly. This models Avaya's commitment to avoiding model lock-in, letting customers bring any LLM client to their data.", col_text_style),
+        Paragraph("• <b>Zero-Copy Data Access:</b> Under the hood, the console queries database tables dynamically via schema tool definitions. Data remains in-place, aligned with Avaya's zero-copy architecture roadmap.", col_text_style),
+        Paragraph("• <b>Edify Journey Flowchart:</b> An animated flowchart diagram mapping dynamic CX stream packet routes, illustrating how Avaya Infinity handles no-code policy orchestration.", col_text_style),
+    ]
+    col2_s4 = [
+        Paragraph("Operational Controls & Telemetry", bold_cyan_style),
+        Paragraph("✔ <b>Tandem Care Checkpoint:</b> Triggers a visual checkpoint requiring supervisor authorization for high-stakes actions, reflecting Avaya's human-in-the-loop safety roadmap.", col_text_style),
+        Paragraph("✔ <b>Multi-Layer Telemetry Coexistence:</b> Visualizes cloud events (AXP) and voice trunk parameters (ACM Jitter/Loss/MOS) side-by-side. Demonstrates Avaya's capability to bridge legacy telephony cores with cloud operations.", col_text_style),
+        Paragraph("✔ <b>Databricks Unity Catalog Alignment:</b> Incorporates PII HIPAA masking and RBAC query block triggers, proving enterprise-grade compliance safeguards.", col_text_style),
+    ]
+    
+    t_s4 = Table([[col1_s4, col2_s4]], colWidths=[5.5*inch, 5.5*inch])
+    t_s4.setStyle(TableStyle([
+        ('VALIGN', (0,0), (-1,-1), 'TOP'),
+        ('RIGHTPADDING', (0,0), (0,0), 20),
+        ('LEFTPADDING', (1,0), (1,0), 20),
+    ]))
+    story.append(t_s4)
+    story.append(PageBreak())
+
+    # Slide 5: Deep Dive: Unified Lakehouse
+    story.append(Paragraph("Detailed Walkthrough: Unified Lakehouse", header_style))
+    story.append(Paragraph("Silo Consolidation & Interactive Data Management Features", subheader_style))
+    story.append(Spacer(1, 10))
+    
+    col1_s5 = [
+        Paragraph("Why Silos Are in the Console", col_title_style),
+        Paragraph("• <b>Simulating Real-World Friction:</b> Enterprises have customer history, ticket CRM data, and policies separated across different database platforms. This view shows them all in one place.", col_text_style),
+        Paragraph("• <b>Zero-Copy Verification:</b> Rather than migrating databases to the LLM, the model issues on-the-fly read queries to separate tables, illustrating zero-copy architectural advantages.", col_text_style),
+        Paragraph("• <b>Interactive SharePoint Document Viewer:</b> Users can select actual warranty, tax, or outage documents from a visual index table and immediately read the text clauses used by the AI model.", col_text_style),
+    ]
+    col2_s5 = [
+        Paragraph("Dynamic Data Silos Features", bold_cyan_style),
+        Paragraph("✔ <b>Unified Tables Index:</b> Includes PostgreSQL Call Database, Salesforce/Zendesk CRM Records, and SharePoint Document Libraries.", col_text_style),
+        Paragraph("✔ <b>Interactive Past Interactions Logger:</b> Let's the presenter manually write and submit a supervisor log entry back to the customer's CRM history, showcasing active writebacks.", col_text_style),
+        Paragraph("✔ <b>Dynamic Customer Seeding:</b> Adding a new CRM customer profile automatically seeds historical interaction records based on account tiers (VIP vs Basic).", col_text_style),
+    ]
+    
+    t_s5 = Table([[col1_s5, col2_s5]], colWidths=[5.5*inch, 5.5*inch])
+    t_s5.setStyle(TableStyle([
+        ('VALIGN', (0,0), (-1,-1), 'TOP'),
+        ('RIGHTPADDING', (0,0), (0,0), 20),
+        ('LEFTPADDING', (1,0), (1,0), 20),
+    ]))
+    story.append(t_s5)
+    story.append(PageBreak())
+
+    # Slide 6: Deep Dive: Security & Governance
+    story.append(Paragraph("Detailed Walkthrough: Security & Governance", header_style))
+    story.append(Paragraph("Centralized Policy Enforcement, HIPAA Protections, and Real-Time Auditing", subheader_style))
+    story.append(Spacer(1, 10))
+    
+    col1_s6 = [
+        Paragraph("Governance Controls & Enforcements", col_title_style),
+        Paragraph("• <b>Dynamic PII Masking:</b> Automatically redacts sensitive names (e.g. Jeff Edwards -> J*** E******) in raw database tables, JSON parameters, trace payloads, and final chat outputs.", col_text_style),
+        Paragraph("• <b>Centralized Proxy Redaction:</b> Demonstrates that data is protected at the API proxy layer, eliminating the risk of LLM prompts leaking sensitive information.", col_text_style),
+        Paragraph("• <b>Restricted DB Access Gatekeeping:</b> Toggling the restriction blocks SQL execution instantly, demonstrating Unity Catalog role-based checks yielding 403 Access Denied messages in the trace.", col_text_style),
+    ]
+    col2_s6 = [
+        Paragraph("Governance Audit Dashboard Features", bold_cyan_style),
+        Paragraph("✔ <b>PII Masked Counter:</b> Running tracker tallying every redaction event occurred in active simulation pipelines.", col_text_style),
+        Paragraph("✔ <b>Blocked Requests Counter:</b> Real-time count of blocked unauthorized calls, highlighting active security gatekeeping.", col_text_style),
+        Paragraph("✔ <b>Compliance SLA Status Indicator:</b> Automatically shows 100% SLA Health, which shifts dynamically if unauthorized query violations exceed safe operating boundaries.", col_text_style),
+    ]
+    
+    t_s6 = Table([[col1_s6, col2_s6]], colWidths=[5.5*inch, 5.5*inch])
+    t_s6.setStyle(TableStyle([
+        ('VALIGN', (0,0), (-1,-1), 'TOP'),
+        ('RIGHTPADDING', (0,0), (0,0), 20),
+        ('LEFTPADDING', (1,0), (1,0), 20),
+    ]))
+    story.append(t_s6)
+    story.append(PageBreak())
+
+    # Slide 7: Business Outcomes & Value Case
+    story.append(Paragraph("Proving the Business Outcome & ROI Case", header_style))
+    story.append(Paragraph("Translating Telemetry Metrics into Financial Outcomes for Sales Leadership", subheader_style))
+    story.append(Spacer(1, 10))
+    
+    col1_s7 = [
+        Paragraph("The Architecture Playground ROI Calculator", col_title_style),
+        Paragraph("• <b>Quantified Cost Reduction:</b> Dynamic calculator card showing Legacy custom connectors ($150,000/yr TCO) vs Avaya Infinity MCP Bus ($15,000/yr TCO)—a 90% maintenance cost savings.", col_text_style),
+        Paragraph("• <b>Agility Metric:</b> Compares 4 months deployment cycles for point-to-point custom adapters against 2 hours for standardized MCP client-server registrations.", col_text_style),
+        Paragraph("• <b>Security Policy Scope:</b> Measures the compliance exposure difference between Legacy (High Risk endpoint leaks) and Avaya Infinity (Protected unified gateway).", col_text_style),
+    ]
+    col2_s7 = [
+        Paragraph("The Aura AI Business Outcome Banners", bold_cyan_style),
+        Paragraph("✔ <b>Queue Performance (Preset 1):</b> Dynamic breakout rescheduling and automated chat diversions prevent $3,200/day in SLA fines.", col_text_style),
+        Paragraph("✔ <b>Contract Security (Preset 2):</b> Priority routing VIP callers during jitter spikes retains $24,000 in VIP account contract ARR.", col_text_style),
+        Paragraph("✔ <b>Revenue Retention (Preset 5):</b> Agentic flow coupon routing saves Jeff Edwards' $8,400 contract value via SOP matching, proving a 6.6x ROI on retention.", col_text_style),
+    ]
+    
+    t_s7 = Table([[col1_s7, col2_s7]], colWidths=[5.5*inch, 5.5*inch])
+    t_s7.setStyle(TableStyle([
+        ('VALIGN', (0,0), (-1,-1), 'TOP'),
+        ('RIGHTPADDING', (0,0), (0,0), 20),
+        ('LEFTPADDING', (1,0), (1,0), 20),
+    ]))
+    story.append(t_s7)
+    story.append(PageBreak())
+
+    # Slide 8: Summary
+    story.append(Spacer(1, 30))
+    story.append(Paragraph("Summary: A Complete Sales Pitch Delivery", header_style))
+    story.append(Paragraph("Aligning Customer Success, Security Compliance, and IT Budgets", subheader_style))
+    story.append(Spacer(1, 20))
+    story.append(Paragraph("Why I Am Prepared to Stand as an Avaya Solutions Consultant:", bold_cyan_style))
+    story.append(Spacer(1, 10))
+    story.append(Paragraph("1. <b>Ability to Simplify Complexity:</b> Translated dry protocol specifications (MCP schemas, JSON payloads) into a high-fidelity visual experience that any buyer can easily understand.", col_text_style))
+    story.append(Paragraph("2. <b>Outcomes-Driven Demos:</b> Put financial results and TCO metrics front and center, ensuring that the technology is directly coupled with the client's business goals ($ savings, SLA compliance, ARR retention).", col_text_style))
+    story.append(Paragraph("3. <b>Mastery of the Portfolio:</b> Handcrafted an application representing Avaya's core architectural tenets—proving I have the technical depth to consult clients on actual roadmaps.", col_text_style))
+    
+    doc.build(story, onFirstPage=draw_bg, onLaterPages=draw_bg)
+    print("Slide deck PDF generated: Avaya_Infinity_MCP_Pitch_Deck.pdf")
+
+
 if __name__ == "__main__":
     generate_pptx()
-    generate_pdf()
+    generate_brief_pdf()
+    generate_deck_pdf()
