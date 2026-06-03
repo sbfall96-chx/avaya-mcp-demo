@@ -84,12 +84,19 @@ def generate_pptx():
     p3.space_before = Pt(30)
 
     p4 = tf.add_paragraph()
-    p4.text = "Presented by: Solutions Consultant Candidate"
+    p4.text = "Presented by: Jeff Edwards"
     p4.font.bold = True
-    p4.font.size = Pt(14)
+    p4.font.size = Pt(15)
     p4.font.color.rgb = CYAN_GLOW
     p4.font.name = "Outfit"
     p4.space_before = Pt(40)
+
+    p5 = tf.add_paragraph()
+    p5.text = "Savannah, GA  |  678-481-5135  |  sbfall96@gmail.com  |  linkedin.com/in/sbfall96  |  github.com/sbfall96-chx/avaya-mcp-demo"
+    p5.font.size = Pt(11)
+    p5.font.color.rgb = TEXT_MUTED
+    p5.font.name = "Outfit"
+    p5.space_before = Pt(10)
 
     # Slide 2: Why I Built This Application (The Intent)
     slide2 = prs.slides.add_slide(prs.slide_layouts[6])
@@ -787,7 +794,23 @@ def generate_deck_pdf():
     story.append(Spacer(1, 20))
     story.append(Paragraph("<font color='#9CA3AF'>A technical deep-dive into why I built this application, what it shows under the hood,<br/>and how it directly demonstrates the business value of Avaya's actual Infinity roadmap.</font>", col_text_style))
     story.append(Spacer(1, 40))
-    story.append(Paragraph("<b>Presented by: Solutions Consultant Candidate</b>", bold_cyan_style))
+    story.append(Paragraph("<b>Presented by: Jeff Edwards</b>", bold_cyan_style))
+    story.append(Spacer(1, 8))
+    
+    contact_style_brief = ParagraphStyle(
+        'BriefContact',
+        parent=col_text_style,
+        fontSize=10,
+        leading=14,
+        textColor=colors.HexColor('#9CA3AF')
+    )
+    
+    contact_text_brief = (
+        "Savannah, GA  |  678-481-5135  |  <a href='mailto:sbfall96@gmail.com' color='#00F0FF'>sbfall96@gmail.com</a>  |  "
+        "<a href='https://linkedin.com/in/sbfall96' color='#00F0FF'>linkedin.com/in/sbfall96</a>  |  "
+        "<a href='https://github.com/sbfall96-chx/avaya-mcp-demo' color='#00F0FF'>github.com/sbfall96-chx/avaya-mcp-demo</a>"
+    )
+    story.append(Paragraph(contact_text_brief, contact_style_brief))
     story.append(PageBreak())
     
     # Slide 2: Why I Built This Application
