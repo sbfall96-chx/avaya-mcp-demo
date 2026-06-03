@@ -1,69 +1,71 @@
-# Avaya Infinity MCP – Secure AI Orchestration & Analytics Control Center
+# Avaya Infinity MCP Console – Solutions Consultant Technical Demo
 
-This repository houses a high-fidelity frontend prototype illustrating **Avaya Infinity's Model Context Protocol (MCP)** implementation, integrated with **Databricks Unity Catalog** for secure, audited communications routing and compliance. 
+This repository houses a high-fidelity frontend prototype demonstrating **Avaya Infinity's Model Context Protocol (MCP)** implementation, integrated with **Databricks Unity Catalog** for secure, audited communications routing and compliance.
 
-This interactive console demonstrates how Avaya's FY26 architecture moves beyond traditional contact centers to **connection orchestration**, replacing legacy custom integrations ($N \times M$ connections) with a clean, standardized AI bus ($N + M$ open connections).
-
----
-
-## 🌟 Key Features
-
-### 1. Agentic AI & BYOAI Brains
-* **AI-Agnostic Routing:** Dynamically swap active AI brains (Gemini 1.5, Claude 3.5, GPT-4o) directly in the UI.
-* **Simulated & Live Modes:** Supports both offline mock scenario processing (perfect for presentations in areas with spotty connection) and **Live Gemini API mode** (which executes real tool calling against live APIs).
-* **Live Protocol Trace:** Inspect the step-by-step MCP JSON payloads, schemas, and return arguments exchanged between the model client and database servers.
-
-### 2. Databricks Enterprise Governance (Zero-Trust)
-* **PII Data Masking (HIPAA Compliance):** Toggle PII masking ON to automatically redact customer names to a standardized fixed-length mask (`J*** E***`) in trace headers, JSON payloads, local database views, and final chat bubbles.
-* **Role-Based Access Control (RBAC):** Toggle Restricted Access ON to witness Databricks Unity Catalog automatically block unauthorized SQL calls with a `403 Permission Denied` security exception.
-* **Live Governance Compliance Summary:** Displays live running counters for PII items masked, blocked requests, and compliance SLA status (100% healthy, degrades if policy breaches occur).
-
-### 3. Sales Outcomes & Financial ROI Metrics
-* **Architecture Playground ROI Panel:** Interactive N x M vs N + M topology selector that compares Legacy integration costs ($150,000/yr TCO, 4-month deployments) against Avaya Infinity standardized bus ($15,000/yr TCO, 2-hour deployments).
-* **Aura AI Business Outcome Banners:** Renders a visual green summary card at the bottom of resolved customer issues detailing exact ARR retained ($24k for VIP escalations, $8.4k for cancellations), SLA fines avoided, and CSAT scores achieved.
-* **Tandem Care (Human-in-the-Loop):** An automated workflow checkpoint that requests supervisor authorization before making high-stakes updates to CRM priorities.
-
-### 4. Interactive Data Silos
-* **Edify Journey Orchestrator:** An interactive, animated flowchart visualization of active voice, chat, and AI-triage routing packets.
-* **Unified Lakehouse Viewer:** Instantly inspect mock PostgreSQL call logs, Zendesk CRM profiles, and SharePoint Knowledge Base SOP documents.
+I designed and built this application to serve as a live portfolio demonstration for my **Solutions Consultant / Sales Engineering interview**. It is structured specifically to prove how a Solutions Consultant can translate abstract backend software architecture (MCP gateway integrations, unified database buses) into high-impact, quantifiable business metrics ($ TCO savings, SLA protections, and revenue retention) that C-suite executives and sales leadership (like Carlos) care about.
 
 ---
 
-## 📂 Presentation & Sales Pitch Assets
+## 💡 Why I Built This Application (The Intent)
 
-We have compiled professional business-case documentation and slide decks directly inside the workspace folder for presentations to sales leadership (Carlos) and customer stakeholders:
-
-1. **[Avaya_Infinity_MCP_Pitch_Deck.pptx](file:///c:/Users/sbfal/OneDrive/Desktop/work/Avaya_Infinity_MCP_Pitch_Deck.pptx)**: A premium 5-slide PowerPoint deck analyzing:
-   * Spaghetti custom integrations ($N \times M$) vs the MCP Standard ($N + M$).
-   * TCO reduction by 90% ($15,000/yr vs $150,000/yr).
-   * Databricks zero-trust compliance, HIPAA PII masking, and RBAC gatekeeping.
-   * Quantifiable business case outcomes for Queue Spikes, VIP Routing, and Contract Churn.
-2. **[Avaya_Infinity_MCP_Executive_Brief.pdf](file:///c:/Users/sbfal/OneDrive/Desktop/work/Avaya_Infinity_MCP_Executive_Brief.pdf)**: A publication-quality executive summary PDF brief detailing TCO metrics, governance checkpoints, and financial ROI models.
+1. **Bridging the Gap:** Technical decision-makers understand API standard protocols, but business leaders need to see cost and operational impacts. This console binds both together visually.
+2. **Client Presentation Readiness:** The application is fully client-side and self-contained. It can run 100% offline (handling mock database queries and AI parses) for presentations in areas with spotty network coverage, or swap to **Live Gemini API mode** to demonstrate real tool-calling logic.
+3. **Avaya Infinity Alignment:** Proves my deep understanding of Avaya's product roadmap, including AI-agnostic model routing (BYOAI), zero-copy Lakehouses, visual journey flowcharts (Edify), and supervisor checks (Tandem Care).
 
 ---
 
-## 🚀 Step-by-Step Demo Guide (For Presenting)
+## 🖥️ What the Application Shows & Why It's Built
 
-Use this exact scenario script to demonstrate the prototype's reasoning, compliance, and financial outcome capabilities to sales leadership:
+The UI is divided into four main tabs, each designed to demonstrate a different technical and business capability during a sales demo:
 
-### Phase 1: Zero-Trust HIPAA Governance
-1. Open the settings (gear icon) and toggle **`PII Data Masking (HIPAA)`** to **ON**, then click **Save Configurations**.
-2. Navigate to **Unified Lakehouse & Silos** tab. Show how name records are auto-masked to `J*** E***`.
-3. In the chat console, run the **VIP CRM Escalation** preset. 
-4. Check the **Databricks Governance Log** tab to verify that the compliance audit trails were logged and archived securely, and notice the **PII Masked** counter has incremented in the Compliance Audit Summary panel.
-5. In Settings, toggle **Restrict Call DB Access** to **ON**. Trigger a query; show how the system blocks unauthorized tool access, yields a 403 Security Exception, and increments the **Blocked Requests** compliance counter.
+### 1. Live Protocol Trace Tab
+* **What it shows:** A scrolling timeline showing step-by-step JSON payloads, headers, schemas, and returned tool data.
+* **Why it's there:** To demystify LLM reasoning. Instead of treating generative AI as a "black box," it proves how the model makes precise tool calls (e.g. `salesforce_crm/get_customer_interaction_history`) via the MCP protocol.
 
-### Phase 2: Showcasing Sales Outcomes & TCO
-1. Go to the **Architecture Playground** tab. 
-2. Show Carlos the N x M vs N + M topology. Toggle between **Legacy** and **Avaya Infinity** to watch the business case update from $150k TCO to $15k TCO, proving a 90% maintenance cost reduction.
-3. Go back to the Chat and click **Dynamic Churn Save**. Observe the Tandem Care checkpoint.
-4. Click **Authorize Credit**. Observe the green **Avaya Business Outcome** banner that renders at the bottom of the final AI response, highlighting **$8,400 ARR Retained** and a **6.6x ROI** relative to customer acquisition cost.
+### 2. Unified Lakehouse & Silos Tab
+* **What it shows:** Live data grids for simulated PostgreSQL call logs, Salesforce CRM accounts, and SharePoint Knowledge Base folders. It also includes an active **ACM Media Telemetry SIP status table** and a rolling **ChartJS Jitter & Packet Loss graph**.
+* **Why it's there:** Proves **Zero-Copy Data Access**. AI queries multiple disparate silos on-the-fly via read-only schemas without copying data. The ACM telemetry proves that legacy voice cores and modern gen-AI systems coexist in a unified dashboard.
+
+### 3. Architecture Playground Tab
+* **What it shows:** An interactive canvas animating particle paths. It contrasts legacy point-to-point connections ($N \times M$ spaghetti custom adapters) against the clean **Avaya Infinity N+M MCP standard bus**. It also houses a sub-tab showing the **Edify Journey Orchestrator node flow**.
+* **Why it's there:** To visualize the reduction in structural IT complexity. It includes an **ROI & TCO Calculator** comparing the legacy model (~$150k/yr, 4 months setup, High Risk) against the MCP standard ($15k/yr, 2 hours setup, Protected).
+
+### 4. Databricks Governance Log Tab
+* **What it shows:** Real-time log entries showing audit trails of database updates, schema reads, and PII masking. It features a **🛡️ Governance Compliance Audit dashboard** tracking masked PII names, blocked queries, and SLA health.
+* **Why it's there:** Highlights zero-trust security. It proves that HIPAA and security constraints are enforced at the gateway layer, protecting data even if the LLM client behaves unpredictably.
 
 ---
 
-## 🛠️ Tech Stack & Development
+## 📂 Sales Pitch & Presentation Assets (Workspace Takeaways)
 
-* **Core:** Standard HTML5 / CSS3 / Vanilla JavaScript.
-* **Visualization:** Chart.js (CDNs imported dynamically for analytical dashboards).
-* **Network Topology:** HTML5 Canvas rendering for real-time particle path simulations.
-* **Zero Dependencies:** Fully self-contained client-side application. Compatible with direct browser execution via the `file://` protocol.
+To support sales meetings and interview panels, I have compiled professional documentation directly in the workspace:
+
+1. **[Avaya_Infinity_MCP_Pitch_Deck.pptx](file:///c:/Users/sbfal/OneDrive/Desktop/work/Avaya_Infinity_MCP_Pitch_Deck.pptx)**: A premium 8-slide PowerPoint presentation covering the project origin, what the app shows, alignment with Avaya's roadmap, deep-dives into Lakehouses & Security, and business outcomes.
+2. **[Avaya_Infinity_MCP_Executive_Brief.pdf](file:///c:/Users/sbfal/OneDrive/Desktop/work/Avaya_Infinity_MCP_Executive_Brief.pdf)**: A print-readySolutions Brief PDF outlining executive summaries, cost comparison tables, and scenario ROI calculations.
+3. **[make_pitch_assets.py](file:///c:/Users/sbfal/OneDrive/Desktop/work/make_pitch_assets.py)**: The underlying Python compilation script that dynamically generates the presentation slides and PDF brief.
+
+---
+
+## 🚀 The Interview Presentation Script (Step-by-Step)
+
+Follow this exact flow to deliver a high-impact, 10-minute presentation to your interview panel:
+
+### Phase 1: Establish the Vision (Why MCP & Unity Catalog?)
+1. Open theSettings Modal (gear icon in header) and toggle **`PII Data Masking (HIPAA)`** to **ON**, then click **Save Configurations**.
+2. Navigate to **Unified Lakehouse & Silos** tab. Explain:
+   > *"Notice that all customer names are automatically redacted to a masked format. Our proxy layer ensures compliance prior to sending queries to the model client, mitigating HIPAA exposure risk in the cloud."*
+
+### Phase 2: Demonstrate AI Reasoning & Trace
+1. In the chat box, click the preset **"VIP CRM Escalation"** or type:
+   > *"Jeff Edwards is complaining about voice jitter, check his ticket and search policies for troubleshooting rules."*
+2. Instantly switch to the **Live Protocol Trace** tab. Explain:
+   > *"Here we see Avaya's MCP in action. The AI client determines it needs customer details, and queries our Salesforce CRM server. In Step 3, it queries the SharePoint KB server. Notice that the names in the inputs and outputs are masked—securing data in-transit."*
+3. Show the final chat response: The AI has combined Jeff's CRM case and the SharePoint policy text to output a resolution.
+
+### Phase 3: Prove the Business TCO & ROI
+1. Switch to the **Architecture Playground** tab. Show the particle flows. Explain:
+   > *"In legacy platforms (N x M), connecting AI applications to databases requires custom point-to-point wrappers. Avaya Infinity simplifies this to an N+M bus. If we toggle the legacy layout at the bottom, TCO jumps to $150,000/yr with 4-month deployments. Toggling to Avaya Infinity lowers TCO by 90% to $15,000/yr, with deployment agility cut to 2 hours."*
+2. Run the **Dynamic Churn Save** preset in Chat.
+3. Under the Tandem Care checkpoint, click **Authorize Credit**. Point to the green **Avaya Business Outcome** banner:
+   > *"By automating SOP policies, we authorized a $1,260 coupon discount to save an $8,400 churn contract. We achieved 6.6x ROI on customer acquisition cost, which I've logged directly to our Databricks audit tab."*
+4. Open the **Databricks Governance Log** tab to show the audit logs and the incremented **PII Masked** and **Blocked Requests** counters on the compliance summary dashboard.

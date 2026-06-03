@@ -19,7 +19,7 @@ def generate_pptx():
     prs.slide_width = Inches(13.333)
     prs.slide_height = Inches(7.5)
 
-    # Theme Colors
+    # Theme Colors (Dark Theme matching the UI)
     DARK_NAVY = RGBColor(10, 14, 23)
     LIGHT_GRAY = RGBColor(243, 244, 246)
     TEXT_MUTED = RGBColor(156, 163, 175)
@@ -54,57 +54,64 @@ def generate_pptx():
             p2.font.name = "Outfit"
             p2.space_before = Pt(4)
 
-    # Slide 1: Title
+    # Slide 1: Title (Interview Intro)
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     apply_background(slide, DARK_NAVY)
     
-    txBox = slide.shapes.add_textbox(Inches(1), Inches(2.0), Inches(11.333), Inches(4))
+    txBox = slide.shapes.add_textbox(Inches(1), Inches(1.8), Inches(11.333), Inches(4.5))
     tf = txBox.text_frame
     tf.word_wrap = True
 
     p1 = tf.paragraphs[0]
-    p1.text = "AVAYA INFINITY"
+    p1.text = "AVAYA INFINITY MCP CONSOLE"
     p1.font.bold = True
-    p1.font.size = Pt(54)
+    p1.font.size = Pt(46)
     p1.font.color.rgb = AVAYA_RED
     p1.font.name = "Outfit"
 
     p2 = tf.add_paragraph()
-    p2.text = "Zero-Trust AI Connection Orchestration & TCO Optimization"
-    p2.font.size = Pt(24)
+    p2.text = "Solutions Consultant Technical Demo & Presentation"
+    p2.font.size = Pt(22)
     p2.font.color.rgb = LIGHT_GRAY
     p2.font.name = "Outfit"
     p2.space_before = Pt(8)
 
     p3 = tf.add_paragraph()
-    p3.text = "Sales Leadership & Solution Architect Pitch Deck\nStandardizing Enterprise AI Bus (MCP) & Databricks Governance"
-    p3.font.size = Pt(14)
+    p3.text = "A technical deep-dive into why I built this application, what it shows under the hood,\nand how it directly demonstrates the business value of Avaya's actual Infinity roadmap."
+    p3.font.size = Pt(15)
     p3.font.color.rgb = TEXT_MUTED
     p3.font.name = "Outfit"
-    p3.space_before = Pt(35)
+    p3.space_before = Pt(30)
 
-    # Slide 2: Legacy Challenge
+    p4 = tf.add_paragraph()
+    p4.text = "Presented by: Solutions Consultant Candidate"
+    p4.font.bold = True
+    p4.font.size = Pt(14)
+    p4.font.color.rgb = CYAN_GLOW
+    p4.font.name = "Outfit"
+    p4.space_before = Pt(40)
+
+    # Slide 2: Why I Built This Application (The Intent)
     slide2 = prs.slides.add_slide(prs.slide_layouts[6])
     apply_background(slide2, DARK_NAVY)
-    add_slide_header(slide2, "The Legacy Challenge: Spaghetti Integrations", "Direct Connections Scale Badly (N x M Custom Connector Mess)")
+    add_slide_header(slide2, "Why I Built This Application: SC Perspective", "Bridging Abstract Architecture with Quantifiable C-Suite Value")
     
-    # Left Box: Tech Spaghetti
-    leftBox = slide2.shapes.add_textbox(Inches(0.75), Inches(1.8), Inches(5.5), Inches(4.8))
+    # Left Column
+    leftBox = slide2.shapes.add_textbox(Inches(0.75), Inches(1.8), Inches(5.6), Inches(4.8))
     tf_l = leftBox.text_frame
     tf_l.word_wrap = True
     
     p = tf_l.paragraphs[0]
-    p.text = "Direct Point-to-Point Pipeline Pain"
+    p.text = "The Engineering & Demo Imperative"
     p.font.bold = True
     p.font.size = Pt(18)
     p.font.color.rgb = LIGHT_GRAY
     p.font.name = "Outfit"
     
     bullets = [
-      "Custom Glue Code: Every database requires bespoke API adapters and custom schemas parsed separately for each model type.",
-      "Hardcoded Credentials: Static tokens and credentials scattered across individual servers, raising security vulnerabilities.",
-      "Audit Nightmare: Security teams must verify role permissions at every endpoint separately, slowing compliance times.",
-      "Friction-heavy Updates: Changing database schema triggers cascading code rewrites across the entire pipeline."
+      "To 'Show, Not Just Tell': Standardized protocol frameworks like Model Context Protocol (MCP) and Lakehouses are abstract concepts. I built this console to make them visual, interactive, and immediately understandable to C-level buyers.",
+      "Sales Enablement Focused: Created a client-ready playground that functions offline (perfect for situations with spotty network coverage) or connects directly to live AI APIs for real tool-calling validation.",
+      "Realistic Scenario Sandbox: Includes pre-configured incident presets (wait-time spikes, churn escalations) that sales engineering teams can run in real-time to walk clients through day-in-the-life contact center challenges."
     ]
     for b in bullets:
         bp = tf_l.add_paragraph()
@@ -113,125 +120,130 @@ def generate_pptx():
         bp.font.color.rgb = TEXT_MUTED
         bp.font.name = "Outfit"
         bp.space_before = Pt(10)
-        bp.space_after = Pt(2)
 
-    # Right Box: Business outcome
-    rightBox = slide2.shapes.add_textbox(Inches(7.0), Inches(1.8), Inches(5.5), Inches(4.8))
+    # Right Column
+    rightBox = slide2.shapes.add_textbox(Inches(6.8), Inches(1.8), Inches(5.6), Inches(4.8))
     tf_r = rightBox.text_frame
     tf_r.word_wrap = True
     
     p = tf_r.paragraphs[0]
-    p.text = "Business Outcomes & Cost Drivers"
+    p.text = "Interview Alignment & Technical Rigor"
     p.font.bold = True
     p.font.size = Pt(18)
-    p.font.color.rgb = AVAYA_RED
+    p.font.color.rgb = CYAN_GLOW
     p.font.name = "Outfit"
     
-    metrics = [
-      ("TCO Integration Overhead:", " ~ $150,000 / year in engineering maintenance.", YELLOW_WARN),
-      ("Agility Deployment Speed:", " 4 Months per new enterprise data source.", YELLOW_WARN),
-      ("Governance Policy Rating:", " High Risk. Redaction is ad-hoc, and LLMs read database schemas directly without strict RBAC gatekeeping.", YELLOW_WARN)
+    bullets_r = [
+      "Demonstrating SC Competencies: Proves my ability to architect a full-stack dashboard, model complex database nodes, implement visual analytics (Chart.js), and code responsive CSS layouts.",
+      "Strategic Solution Strategy: Directly showcases my grasp of Avaya's product portfolio—highlighting the value proposition of AXP cloud telemetry and ACM core media layers.",
+      "Interactive Value Pitch: Designed specifically to address Carlos and other sales leaders' target needs—focusing on ROI calculators, compliance controls, and SLA penalty mitigations."
     ]
-    for label, val, color in metrics:
-        bp1 = tf_r.add_paragraph()
-        bp1.text = label
-        bp1.font.bold = True
-        bp1.font.size = Pt(14)
-        bp1.font.color.rgb = color
-        bp1.font.name = "Outfit"
-        bp1.space_before = Pt(14)
-        
-        bp2 = tf_r.add_paragraph()
-        bp2.text = val
-        bp2.font.size = Pt(13)
-        bp2.font.color.rgb = TEXT_MUTED
-        bp2.font.name = "Outfit"
-
-    # Slide 3: The Avaya Solution
-    slide3 = prs.slides.add_slide(prs.slide_layouts[6])
-    apply_background(slide3, DARK_NAVY)
-    add_slide_header(slide3, "The Solution: Avaya Infinity MCP Bus", "Unified Connection Gateway (N + M Plug-and-Play Standardization)")
-    
-    # Left Box
-    leftBox3 = slide3.shapes.add_textbox(Inches(0.75), Inches(1.8), Inches(5.5), Inches(4.8))
-    tf_l3 = leftBox3.text_frame
-    tf_l3.word_wrap = True
-    
-    p = tf_l3.paragraphs[0]
-    p.text = "Universal Connection Standards"
-    p.font.bold = True
-    p.font.size = Pt(18)
-    p.font.color.rgb = LIGHT_GRAY
-    p.font.name = "Outfit"
-    
-    bullets = [
-      "The 'USB-C for AI': Standardized Model Context Protocol client-server architecture eliminates point-to-point custom wrappers.",
-      "Dynamic Discovery: Secure MCP Gateway automatically queries registered silos (Postgres, CRM, SharePoint) to expose resources, tools, and prompt structures on-the-fly.",
-      "Separation of Concerns: Data repositories declare query scopes; LLMs consume clean APIs without direct table credentials.",
-      "Multi-Brain Swap: Swap underlying AI brains (Gemini, Claude, GPT) instantly without refactoring data layer connectors."
-    ]
-    for b in bullets:
-        bp = tf_l3.add_paragraph()
-        bp.text = "• " + b
+    for b in bullets_r:
+        bp = tf_r.add_paragraph()
+        bp.text = "✔ " + b
         bp.font.size = Pt(13)
         bp.font.color.rgb = TEXT_MUTED
         bp.font.name = "Outfit"
         bp.space_before = Pt(10)
 
-    # Right Box
-    rightBox3 = slide3.shapes.add_textbox(Inches(7.0), Inches(1.8), Inches(5.5), Inches(4.8))
-    tf_r3 = rightBox3.text_frame
-    tf_r3.word_wrap = True
+    # Slide 3: What the Application Actually Shows
+    slide3 = prs.slides.add_slide(prs.slide_layouts[6])
+    apply_background(slide3, DARK_NAVY)
+    add_slide_header(slide3, "What the Application Actually Shows", "An Interactive Guided Tour of the Core Modules Built")
     
-    p = tf_r3.paragraphs[0]
-    p.text = "Unified Sales Outcome Benefits"
+    # Grid Columns (4 Pillars)
+    col_width = Inches(5.5)
+    row_height = Inches(2.2)
+    
+    # Top Left
+    tl = slide3.shapes.add_textbox(Inches(0.75), Inches(1.8), col_width, row_height)
+    tf_tl = tl.text_frame
+    tf_tl.word_wrap = True
+    p = tf_tl.paragraphs[0]
+    p.text = "1. Live Protocol Trace (The 'How')"
     p.font.bold = True
-    p.font.size = Pt(18)
+    p.font.size = Pt(16)
+    p.font.color.rgb = CYAN_GLOW
+    p.font.name = "Outfit"
+    p_desc = tf_tl.add_paragraph()
+    p_desc.text = "Provides step-by-step transparency. It captures raw JSON inputs, tool schemas, and output payloads exchanged between the model client and MCP database servers, demystifying AI decision logic."
+    p_desc.font.size = Pt(12)
+    p_desc.font.color.rgb = TEXT_MUTED
+    p_desc.font.name = "Outfit"
+    p_desc.space_before = Pt(4)
+
+    # Top Right
+    tr = slide3.shapes.add_textbox(Inches(6.8), Inches(1.8), col_width, row_height)
+    tf_tr = tr.text_frame
+    tf_tr.word_wrap = True
+    p = tf_tr.paragraphs[0]
+    p.text = "2. Unified Lakehouse & Silos (The 'What')"
+    p.font.bold = True
+    p.font.size = Pt(16)
+    p.font.color.rgb = YELLOW_WARN
+    p.font.name = "Outfit"
+    p_desc = tf_tr.add_paragraph()
+    p_desc.text = "Visualizes simulated CRM profiles, SQL database logs, and SharePoint Knowledge Base tables. Proves that models can retrieve siloed customer data without copying or duplicating data repositories."
+    p_desc.font.size = Pt(12)
+    p_desc.font.color.rgb = TEXT_MUTED
+    p_desc.font.name = "Outfit"
+    p_desc.space_before = Pt(4)
+
+    # Bottom Left
+    bl = slide3.shapes.add_textbox(Inches(0.75), Inches(4.3), col_width, row_height)
+    tf_bl = bl.text_frame
+    tf_bl.word_wrap = True
+    p = tf_bl.paragraphs[0]
+    p.text = "3. Interactive Network Playground (The 'Why')"
+    p.font.bold = True
+    p.font.size = Pt(16)
     p.font.color.rgb = GREEN_ROI
     p.font.name = "Outfit"
-    
-    metrics = [
-      ("TCO Integration Cost:", " $15,000 / year (90% savings over custom code).", GREEN_ROI),
-      ("Agility Deployment Speed:", " 2 Hours. Fast plug-and-play capability to connect database nodes.", GREEN_ROI),
-      ("Governance Policy Rating:", " Secure & Compliant. Low threat footprint; centralized RBAC policies protect underlying data layers.", GREEN_ROI)
-    ]
-    for label, val, color in metrics:
-        bp1 = tf_r3.add_paragraph()
-        bp1.text = label
-        bp1.font.bold = True
-        bp1.font.size = Pt(14)
-        bp1.font.color.rgb = color
-        bp1.font.name = "Outfit"
-        bp1.space_before = Pt(14)
-        
-        bp2 = tf_r3.add_paragraph()
-        bp2.text = val
-        bp2.font.size = Pt(13)
-        bp2.font.color.rgb = TEXT_MUTED
-        bp2.font.name = "Outfit"
+    p_desc = tf_bl.add_paragraph()
+    p_desc.text = "Animates active connection lines and flowing data packets. Instantly models legacy integration mess (N x M spaghetti) vs the clean unified bus (N + M MCP) and Edify policy routing layouts."
+    p_desc.font.size = Pt(12)
+    p_desc.font.color.rgb = TEXT_MUTED
+    p_desc.font.name = "Outfit"
+    p_desc.space_before = Pt(4)
 
-    # Slide 4: Databricks Governance
+    # Bottom Right
+    br = slide3.shapes.add_textbox(Inches(6.8), Inches(4.3), col_width, row_height)
+    tf_br = br.text_frame
+    tf_br.word_wrap = True
+    p = tf_br.paragraphs[0]
+    p.text = "4. Databricks Governance Log (The 'Security')"
+    p.font.bold = True
+    p.font.size = Pt(16)
+    p.font.color.rgb = AVAYA_RED
+    p.font.name = "Outfit"
+    p_desc = tf_br.add_paragraph()
+    p_desc.text = "Logs compliance activities in real-time. Highlights PII redactions, RBAC access blocks, and logs all gateway actions directly into Unity Catalog audit tables for total transparency."
+    p_desc.font.size = Pt(12)
+    p_desc.font.color.rgb = TEXT_MUTED
+    p_desc.font.name = "Outfit"
+    p_desc.space_before = Pt(4)
+
+    # Slide 4: Aligning with Avaya's Actual Roadmap
     slide4 = prs.slides.add_slide(prs.slide_layouts[6])
     apply_background(slide4, DARK_NAVY)
-    add_slide_header(slide4, "Zero-Trust Governance: Databricks Unity Catalog", "Centralized Access Guardrails, Privacy Controls, and Audits")
+    add_slide_header(slide4, "How It Represents Avaya's Actual Infinity", "Translating Architecture Guidelines to Interactive Solutions")
     
-    # Left Box
-    leftBox4 = slide4.shapes.add_textbox(Inches(0.75), Inches(1.8), Inches(5.5), Inches(4.8))
+    # Left Column
+    leftBox4 = slide4.shapes.add_textbox(Inches(0.75), Inches(1.8), Inches(5.6), Inches(4.8))
     tf_l4 = leftBox4.text_frame
     tf_l4.word_wrap = True
     
     p = tf_l4.paragraphs[0]
-    p.text = "Centralized Compliance Enforcements"
+    p.text = "Core Infrastructure Pillars"
     p.font.bold = True
     p.font.size = Pt(18)
     p.font.color.rgb = LIGHT_GRAY
     p.font.name = "Outfit"
     
     bullets = [
-      "PII HIPAA Redaction: Central parser intercepts prompts and results to mask patient/customer names (e.g. Jeff Edwards -> J*** E******).",
-      "Restricted DB Access (RBAC): Automatically blocks raw tool calls to protected tables with a 403 authorization error.",
-      "Live Audit Trail: Every LLM query, database invocation, and security exception is logged instantly to Databricks Audit tables.",
-      "Zero-Copy Architecture: Models query databases in-place; no separate copies of client contact history stored on external disks."
+      "AI-Agnostic BYOAI Framework: In the UI, the operator can switch AI models seamlessly. This models Avaya's commitment to avoiding model lock-in, letting customers bring any LLM client to their data.",
+      "Zero-Copy Data Access: Under the hood, the console queries database tables dynamically via schema tool definitions. Data remains in-place, aligned with Avaya's zero-copy architecture roadmap.",
+      "Edify Journey Flowchart: An animated flowchart diagram mapping dynamic CX stream packet routes, illustrating how Avaya Infinity handles no-code policy orchestration."
     ]
     for b in bullets:
         bp = tf_l4.add_paragraph()
@@ -241,132 +253,230 @@ def generate_pptx():
         bp.font.name = "Outfit"
         bp.space_before = Pt(10)
 
-    # Right Box
-    rightBox4 = slide4.shapes.add_textbox(Inches(7.0), Inches(1.8), Inches(5.5), Inches(4.8))
+    # Right Column
+    rightBox4 = slide4.shapes.add_textbox(Inches(6.8), Inches(1.8), Inches(5.6), Inches(4.8))
     tf_r4 = rightBox4.text_frame
     tf_r4.word_wrap = True
     
     p = tf_r4.paragraphs[0]
-    p.text = "Compliance Metrics Dashboard"
+    p.text = "Operational Controls & Telemetry"
     p.font.bold = True
     p.font.size = Pt(18)
     p.font.color.rgb = CYAN_GLOW
     p.font.name = "Outfit"
     
-    dashboard_bullets = [
-      "PII Masked Count: Baseline 24 names auto-redacted in active simulation runs.",
-      "Blocks Enforced: Real-time prevention of access violations (preventing data leaks in tool execution).",
-      "SLA Health Status: 100% compliance SLA verified by Databricks logging dashboard.",
-      "Audit Coverage: 100% of data pipeline logs monitored and archived for HIPAA/GDPR reviews."
+    bullets_r = [
+      "Tandem Care Checkpoint: Triggers a visual checkpoint requiring supervisor authorization for high-stakes actions, reflecting Avaya's human-in-the-loop safety roadmap.",
+      "Multi-Layer Telemetry Coexistence: Visualizes cloud events (AXP) and voice trunk parameters (ACM Jitter/Loss/MOS) side-by-side. Demonstrates Avaya's capability to bridge legacy telephony cores with cloud operations.",
+      "Databricks Unity Catalog Alignment: Incorporates PII HIPAA masking and RBAC query block triggers, proving enterprise-grade compliance safeguards."
     ]
-    for db in dashboard_bullets:
+    for b in bullets_r:
         bp = tf_r4.add_paragraph()
-        bp.text = "✔ " + db
+        bp.text = "✔ " + b
         bp.font.size = Pt(13)
-        bp.font.color.rgb = LIGHT_GRAY
+        bp.font.color.rgb = TEXT_MUTED
         bp.font.name = "Outfit"
-        bp.space_before = Pt(12)
+        bp.space_before = Pt(10)
 
-    # Slide 5: Real-World Scenarios
+    # Slide 5: Deep Dive: Unified Lakehouse ( SC walkthrough)
     slide5 = prs.slides.add_slide(prs.slide_layouts[6])
     apply_background(slide5, DARK_NAVY)
-    add_slide_header(slide5, "Real-World Scenarios & Business ROI Outcomes", "Quantifying Financial Value in Contact Center Operations")
+    add_slide_header(slide5, "Detailed Walkthrough: Unified Lakehouse", "Silo Consolidation & Interactive Data Management Features")
     
-    # 3-Column Grid
-    width = Inches(3.6)
-    height = Inches(4.8)
-    y_pos = Inches(1.8)
+    # Left Column
+    leftBox5 = slide5.shapes.add_textbox(Inches(0.75), Inches(1.8), Inches(5.6), Inches(4.8))
+    tf_l5 = leftBox5.text_frame
+    tf_l5.word_wrap = True
     
-    # Column 1
-    c1 = slide5.shapes.add_textbox(Inches(0.75), y_pos, width, height)
-    tf1 = c1.text_frame
-    tf1.word_wrap = True
-    p = tf1.paragraphs[0]
-    p.text = "1. Queue Recovery Spike"
+    p = tf_l5.paragraphs[0]
+    p.text = "Why Silos Are in the Console"
     p.font.bold = True
-    p.font.size = Pt(16)
-    p.font.color.rgb = CYAN_GLOW
+    p.font.size = Pt(18)
+    p.font.color.rgb = LIGHT_GRAY
     p.font.name = "Outfit"
     
-    c1_txt = [
-      "Scenario: Mandatory team training triggers sudden queue wait time spikes.",
-      "AI Resolution: Aura AI scans agent timetables, blocks concurrent breaks, and diverts incoming chats to self-service lanes.",
-      "Business Outcome:",
-      "Restored wait time from 185s to 15s. Prevented $3,200/day in SLA compliance fines."
+    bullets = [
+      "Simulating Real-World Friction: Enterprises have customer history, ticket CRM data, and policies separated across different database platforms. This view shows them all in one place.",
+      "Zero-Copy Verification: Rather than migrating databases to the LLM, the model issues on-the-fly read queries to separate tables, illustrating zero-copy architectural advantages.",
+      "Interactive SharePoint Document Viewer: Users can select actual warranty, tax, or outage documents from a visual index table and immediately read the text clauses used by the AI model."
     ]
-    for t in c1_txt:
-        bp = tf1.add_paragraph()
-        bp.text = t
-        if "Business Outcome:" in t:
-            bp.font.bold = True
-            bp.font.color.rgb = GREEN_ROI
-        else:
-            bp.font.color.rgb = TEXT_MUTED
-        bp.font.size = Pt(11.5)
+    for b in bullets:
+        bp = tf_l5.add_paragraph()
+        bp.text = "• " + b
+        bp.font.size = Pt(13)
+        bp.font.color.rgb = TEXT_MUTED
         bp.font.name = "Outfit"
-        bp.space_before = Pt(6)
+        bp.space_before = Pt(10)
 
-    # Column 2
-    c2 = slide5.shapes.add_textbox(Inches(4.8), y_pos, width, height)
-    tf2 = c2.text_frame
-    tf2.word_wrap = True
-    p = tf2.paragraphs[0]
-    p.text = "2. VIP Priority Routing"
+    # Right Column
+    rightBox5 = slide5.shapes.add_textbox(Inches(6.8), Inches(1.8), Inches(5.6), Inches(4.8))
+    tf_r5 = rightBox5.text_frame
+    tf_r5.word_wrap = True
+    
+    p = tf_r5.paragraphs[0]
+    p.text = "Dynamic Data Silos Features"
     p.font.bold = True
-    p.font.size = Pt(16)
+    p.font.size = Pt(18)
     p.font.color.rgb = CYAN_GLOW
     p.font.name = "Outfit"
     
-    c2_txt = [
-      "Scenario: SIP trunk voice jitter spikes for active enterprise accounts.",
-      "AI Resolution: Tandem Care triggers L3 priority escalation checkpoint requiring supervisor approval.",
-      "Business Outcome:",
-      "Rerouted VIP calls in 10s. Retained $24,000 in VIP account contract ARR and secured 100% CSAT."
+    bullets_r = [
+      "Unified Tables Index: Includes PostgreSQL Call Database, Salesforce/Zendesk CRM Records, and SharePoint Document Libraries.",
+      "Interactive Past Interactions Logger: Let's the presenter manually write and submit a supervisor log entry back to the customer's CRM history, showcasing active writebacks.",
+      "Dynamic Customer Seeding: Adding a new CRM customer profile automatically seeds historical interaction records based on account tiers (VIP vs Basic)."
     ]
-    for t in c2_txt:
-        bp = tf2.add_paragraph()
-        bp.text = t
-        if "Business Outcome:" in t:
-            bp.font.bold = True
-            bp.font.color.rgb = GREEN_ROI
-        else:
-            bp.font.color.rgb = TEXT_MUTED
-        bp.font.size = Pt(11.5)
+    for b in bullets_r:
+        bp = tf_r5.add_paragraph()
+        bp.text = "✔ " + b
+        bp.font.size = Pt(13)
+        bp.font.color.rgb = TEXT_MUTED
         bp.font.name = "Outfit"
-        bp.space_before = Pt(6)
+        bp.space_before = Pt(10)
 
-    # Column 3
-    c3 = slide5.shapes.add_textbox(Inches(8.85), y_pos, width, height)
-    tf3 = c3.text_frame
-    tf3.word_wrap = True
-    p = tf3.paragraphs[0]
-    p.text = "3. Churn Prevention ROI"
+    # Slide 6: Deep Dive: Security & Governance
+    slide6 = prs.slides.add_slide(prs.slide_layouts[6])
+    apply_background(slide6, DARK_NAVY)
+    add_slide_header(slide6, "Detailed Walkthrough: Security & Governance", "Centralized Policy Enforcement, HIPAA Protections, and Real-Time Auditing")
+    
+    # Left Column
+    leftBox6 = slide6.shapes.add_textbox(Inches(0.75), Inches(1.8), Inches(5.6), Inches(4.8))
+    tf_l6 = leftBox6.text_frame
+    tf_l6.word_wrap = True
+    
+    p = tf_l6.paragraphs[0]
+    p.text = "Governance Controls & Enforcements"
     p.font.bold = True
-    p.font.size = Pt(16)
+    p.font.size = Pt(18)
+    p.font.color.rgb = LIGHT_GRAY
+    p.font.name = "Outfit"
+    
+    bullets = [
+      "Dynamic PII Masking: Automatically redacts sensitive names (e.g. Jeff Edwards -> J*** E******) in raw database tables, JSON parameters, trace payloads, and final chat outputs.",
+      "Centralized Proxy Redaction: Demonstrates that data is protected at the API proxy layer, eliminating the risk of LLM prompts leaking sensitive information.",
+      "Restricted DB Access Gatekeeping: Toggling the restriction blocks SQL execution instantly, demonstrating Unity Catalog role-based checks yielding 403 Access Denied messages in the trace."
+    ]
+    for b in bullets:
+        bp = tf_l6.add_paragraph()
+        bp.text = "• " + b
+        bp.font.size = Pt(13)
+        bp.font.color.rgb = TEXT_MUTED
+        bp.font.name = "Outfit"
+        bp.space_before = Pt(10)
+
+    # Right Column
+    rightBox6 = slide6.shapes.add_textbox(Inches(6.8), Inches(1.8), Inches(5.6), Inches(4.8))
+    tf_r6 = rightBox6.text_frame
+    tf_r6.word_wrap = True
+    
+    p = tf_r6.paragraphs[0]
+    p.text = "Governance Audit Dashboard Features"
+    p.font.bold = True
+    p.font.size = Pt(18)
     p.font.color.rgb = CYAN_GLOW
     p.font.name = "Outfit"
     
-    c3_txt = [
-      "Scenario: Customer threatens cancellation due to pricing issues.",
-      "AI Resolution: Queries SharePoint KB policies, calculates maximum authorized credit structure, logs coupon trace.",
-      "Business Outcome:",
-      "Authorized $1,260 retention credit, saving $8,400 contract value. Achieved 6.6x ROI on CAC."
+    bullets_r = [
+      "PII Masked Counter: Running tracker tallying every redaction event occurred in active simulation pipelines.",
+      "Blocked Requests Counter: Real-time count of blocked unauthorized calls, highlighting active security gatekeeping.",
+      "Compliance SLA Status Indicator: Automatically shows 100% SLA Health, which shifts dynamically if unauthorized query violations exceed safe operating boundaries.",
+      "Auditable Logs: Standardized log format matching Databricks catalog traces, making compliance checks simple."
     ]
-    for t in c3_txt:
-        bp = tf3.add_paragraph()
-        bp.text = t
-        if "Business Outcome:" in t:
-            bp.font.bold = True
-            bp.font.color.rgb = GREEN_ROI
-        else:
-            bp.font.color.rgb = TEXT_MUTED
-        bp.font.size = Pt(11.5)
+    for b in bullets_r:
+        bp = tf_r6.add_paragraph()
+        bp.text = "✔ " + b
+        bp.font.size = Pt(13)
+        bp.font.color.rgb = TEXT_MUTED
         bp.font.name = "Outfit"
-        bp.space_before = Pt(6)
+        bp.space_before = Pt(10)
+
+    # Slide 7: Business Outcomes & Value Case
+    slide7 = prs.slides.add_slide(prs.slide_layouts[6])
+    apply_background(slide7, DARK_NAVY)
+    add_slide_header(slide7, "Proving the Business Outcome & ROI Case", "Translating Telemetry Metrics into Financial Outcomes for Sales Leadership")
+    
+    # Left Column
+    leftBox7 = slide7.shapes.add_textbox(Inches(0.75), Inches(1.8), Inches(5.6), Inches(4.8))
+    tf_l7 = leftBox7.text_frame
+    tf_l7.word_wrap = True
+    
+    p = tf_l7.paragraphs[0]
+    p.text = "The Architecture Playground ROI Calculator"
+    p.font.bold = True
+    p.font.size = Pt(18)
+    p.font.color.rgb = LIGHT_GRAY
+    p.font.name = "Outfit"
+    
+    bullets = [
+      "Quantified Cost Reduction: Dynamic calculator card showing Legacy custom connectors ($150,000/yr TCO) vs Avaya Infinity MCP Bus ($15,000/yr TCO)—a 90% maintenance cost savings.",
+      "Agility Metric: Compares 4 months deployment cycles for point-to-point custom adapters against 2 hours for standardized MCP client-server registrations.",
+      "Security Policy Scope: Measures the compliance exposure difference between Legacy (High Risk endpoint leaks) and Avaya Infinity (Protected unified gateway)."
+    ]
+    for b in bullets:
+        bp = tf_l7.add_paragraph()
+        bp.text = "• " + b
+        bp.font.size = Pt(13)
+        bp.font.color.rgb = TEXT_MUTED
+        bp.font.name = "Outfit"
+        bp.space_before = Pt(10)
+
+    # Right Column
+    rightBox7 = slide7.shapes.add_textbox(Inches(6.8), Inches(1.8), Inches(5.6), Inches(4.8))
+    tf_r7 = rightBox7.text_frame
+    tf_r7.word_wrap = True
+    
+    p = tf_r7.paragraphs[0]
+    p.text = "The Aura AI Business Outcome Banners"
+    p.font.bold = True
+    p.font.size = Pt(18)
+    p.font.color.rgb = CYAN_GLOW
+    p.font.name = "Outfit"
+    
+    bullets_r = [
+      "Queue Performance (Preset 1): Dynamic breakout rescheduling and automated chat diversions prevent $3,200/day in SLA fines.",
+      "Contract Security (Preset 2): Priority routing VIP callers during jitter spikes retains $24,000 in VIP account contract ARR.",
+      "Revenue Retention (Preset 5): Leverages policy guidelines to authorize a $1,260 coupon discount to save an $8,400 churn contract, achieving 6.6x ROI on CAC."
+    ]
+    for b in bullets_r:
+        bp = tf_r7.add_paragraph()
+        bp.text = "✔ " + b
+        bp.font.size = Pt(13)
+        bp.font.color.rgb = TEXT_MUTED
+        bp.font.name = "Outfit"
+        bp.space_before = Pt(10)
+
+    # Slide 8: SC Pitch Closing
+    slide8 = prs.slides.add_slide(prs.slide_layouts[6])
+    apply_background(slide8, DARK_NAVY)
+    add_slide_header(slide8, "Summary: A Complete Sales Pitch Delivery", "Aligning Customer Success, Security Compliance, and IT Budgets")
+    
+    txBox = slide8.shapes.add_textbox(Inches(1), Inches(1.8), Inches(11.333), Inches(4.5))
+    tf8 = txBox.text_frame
+    tf8.word_wrap = True
+
+    p1 = tf8.paragraphs[0]
+    p1.text = "Why I Am Prepared to Stand as an Avaya Solutions Consultant:"
+    p1.font.bold = True
+    p1.font.size = Pt(20)
+    p1.font.color.rgb = CYAN_GLOW
+    p1.font.name = "Outfit"
+
+    points = [
+      "1. Ability to Simplify Complexity: Translated dry protocol specifications (MCP schemas, JSON payloads) into a high-fidelity visual experience that any buyer can easily understand.",
+      "2. Outcomes-Driven Demos: Put financial results and TCO metrics front and center, ensuring that the technology is directly coupled with the client's business goals ($ savings, SLA compliance, ARR retention).",
+      "3. Mastery of the Portfolio: Handcrafted an application representing Avaya's core architectural tenets—proving I have the technical depth to consult clients on actual roadmaps."
+    ]
+    for pt in points:
+        bp = tf8.add_paragraph()
+        bp.text = pt
+        bp.font.size = Pt(14.5)
+        bp.font.color.rgb = LIGHT_GRAY
+        bp.font.name = "Outfit"
+        bp.space_before = Pt(14)
 
     # Save
     prs.save("Avaya_Infinity_MCP_Pitch_Deck.pptx")
     print("PowerPoint deck generated: Avaya_Infinity_MCP_Pitch_Deck.pptx")
+
 
 # =========================================================================
 # PART 2: PDF BRIEF GENERATOR (ReportLab)
@@ -447,39 +557,43 @@ def generate_pdf():
     
     story = []
     
-    # ----------------- TITLE PAGE / SECTION 1 -----------------
-    story.append(Paragraph("AVAYA INFINITY MCP SOLUTIONS BRIEF", title_style))
-    story.append(Paragraph("Standardizing AI Connections & Centralizing Databricks Governance", subtitle_style))
+    # ----------------- SECTION 1 -----------------
+    story.append(Paragraph("AVAYA INFINITY SOLUTIONS BRIEF: SC INTERVIEW GUIDE", title_style))
+    story.append(Paragraph("A Technical Deep-Dive into the Architecture, Security, and Business Value of the MCP Prototype", subtitle_style))
     story.append(Spacer(1, 10))
     
-    story.append(Paragraph("1. Executive Summary", h2_style))
+    story.append(Paragraph("1. Purpose & Application Context", h2_style))
     story.append(Paragraph(
-        "Avaya Infinity's Model Context Protocol (MCP) framework shifts enterprise communication systems "
-        "from traditional static point-to-point connections to dynamic AI-driven connection orchestration. "
-        "Historically, custom pipelines required massive coding efforts to connect models directly to backend databases, "
-        "inflating maintenance budgets and raising security exposure concerns. By introducing a centralized MCP gateway, "
-        "Avaya enables unified data discovery, real-time query parsing, and seamless multi-AI model support, "
-        "reducing implementation costs by up to 90% and integration times from months to hours.",
+        "This Solutions Brief serves as a technical walkthrough designed to present during solutions consulting and "
+        "sales engineering interview cycles. The accompanying console application was created to bridge the gap between "
+        "abstract database standards—such as the Model Context Protocol (MCP)—and the tangible, high-level business case "
+        "metrics that C-suite stakeholders prioritize ($ TCO savings, deployment speed, and HIPAA SLA protection).",
+        body_style
+    ))
+    story.append(Paragraph(
+        "By presenting this application, the candidate demonstrates an understanding of Avaya's actual Infinity roadmap: "
+        "including AI-agnostic models integration (BYOAI), zero-copy Lakehouses, human-in-the-loop priority routing safeguards "
+        "(Tandem Care), and strict zero-trust audit compliance checked by Databricks Unity Catalog.",
         body_style
     ))
     
     story.append(Spacer(1, 10))
-    story.append(Paragraph("2. Financial Comparison & TCO Metrics", h2_style))
+    story.append(Paragraph("2. Financial Value: Legacy Spaghetti vs. Avaya Infinity", h2_style))
     story.append(Paragraph(
-        "For sales leadership (Carlos) and sales engineers (SEs), the value proposition is represented by "
-        "the reduction in connection complexity from an N x M custom mess to a standard N + M open bus:",
+        "The Architecture Playground tab in the application models the direct business impact of simplifying integration pipelines "
+        "from legacy custom-coded connectors ($N \\times M$ paths) to the standardized Model Context Protocol ($N + M$ bus):",
         body_style
     ))
     
     # TCO Table
     table_data = [
         [Paragraph("Metric", bold_body_style), 
-         Paragraph("Legacy Spaghetti Architecture", bold_body_style), 
-         Paragraph("Avaya Infinity MCP Bus", bold_body_style)],
-        [Paragraph("Annual TCO", body_style), Paragraph("$150,000 / year (Custom code maintenance)", body_style), Paragraph("$15,000 / year (90% savings)", body_style)],
-        [Paragraph("Deployment Agility", body_style), Paragraph("4 Months per connector", body_style), Paragraph("2 Hours plug-and-play", body_style)],
-        [Paragraph("Security/Compliance", body_style), Paragraph("High Risk (Static files, exposed credentials)", body_style), Paragraph("Protected (Zero-Trust isolation)", body_style)],
-        [Paragraph("Integration Logic", body_style), Paragraph("N x M point-to-point scripting", body_style), Paragraph("N + M unified schema gateway", body_style)]
+         Paragraph("Legacy Point-to-Point Connectors", bold_body_style), 
+         Paragraph("Avaya Infinity MCP Bus Architecture", bold_body_style)],
+        [Paragraph("Annual TCO", body_style), Paragraph("$150,000 / year in developer maintenance", body_style), Paragraph("$15,000 / year (90% maintenance cost savings)", body_style)],
+        [Paragraph("Deployment Speed", body_style), Paragraph("4 Months per enterprise data repository", body_style), Paragraph("2 Hours plug-and-play client-server setup", body_style)],
+        [Paragraph("Security Policy Scope", body_style), Paragraph("High Risk (Static files, scattered API tokens)", body_style), Paragraph("Protected (Centralized zero-trust API gateway)", body_style)],
+        [Paragraph("Integration Bus", body_style), Paragraph("N x M bespoke integration wrappers", body_style), Paragraph("N + M unified schemas exposed to models", body_style)]
     ]
     
     t = Table(table_data, colWidths=[1.5*inch, 2.5*inch, 2.5*inch])
@@ -493,38 +607,38 @@ def generate_pdf():
         ('BOTTOMPADDING', (0,0), (-1,-1), 6),
     ]))
     story.append(t)
-    story.append(Spacer(1, 15))
+    story.append(Spacer(1, 10))
     
     # ----------------- SECTION 3 -----------------
     story.append(Paragraph("3. Databricks Unity Catalog Enterprise Governance", h2_style))
     story.append(Paragraph(
-        "Avaya Infinity wraps all database queries through Databricks Unity Catalog to enforce zero-trust security:",
+        "Avaya Infinity enforces zero-trust security parameters directly through the gateway database layer:",
         body_style
     ))
-    story.append(Paragraph("• <b>Dynamic HIPAA Redaction:</b> Customer profiles are automatically masked inside tool arguments, database inserts, and chat responses. Customer names are replaced with formatted redacted masks.", bullet_style))
-    story.append(Paragraph("• <b>Role-Based Access Control (RBAC):</b> If unauthorized database calls are attempted (e.g. settings restricted), the query fails immediately with a secure 403 Exception.", bullet_style))
-    story.append(Paragraph("• <b>Unified Compliance Audit Logging:</b> Access blocks, credential updates, and masking triggers are dynamically pushed into centralized audit logs.", bullet_style))
+    story.append(Paragraph("• <b>Dynamic HIPAA Masking:</b> The proxy layer intercepts customer records (like Jeff Edwards) and replaces them with redacted formats (J*** E******) in payloads, SQL INSERT events, and chat windows.", bullet_style))
+    story.append(Paragraph("• <b>Centralized RBAC Rules:</b> Unauthorized database queries are blocked at the gateway level, returning 403 Security Exceptions, preventing data leakage.", bullet_style))
+    story.append(Paragraph("• <b>Active Compliance Dashboard:</b> Running counters monitor PII items masked, request blocks, and SLA compliance health in real-time.", bullet_style))
     
     story.append(Spacer(1, 10))
     
-    story.append(Paragraph("4. Simulated Scenarios & Business Outcomes", h2_style))
+    story.append(Paragraph("4. Presets & Simulated Business Outcomes", h2_style))
     
     scenarios_data = [
-        [Paragraph("Scenario", bold_body_style), Paragraph("AI Action", bold_body_style), Paragraph("Business Outcome", bold_body_style)],
+        [Paragraph("Scenario Preset", bold_body_style), Paragraph("Aura AI Tool Action", bold_body_style), Paragraph("Quantified Outcome & ROI", bold_body_style)],
         [
             Paragraph("<b>Queue Recovery Spike</b>", body_style), 
-            Paragraph("Identifies break schedules, blocks concurrent webinar meetings, redirects chat traffic.", body_style), 
-            Paragraph("Wait time cut from 185s to 15s. Prevented <b>$3,200/day</b> in SLA penalties.", body_style)
+            Paragraph("Queries active schedules via Postgres & Zendesk CRM; blocks training conflicts; reroutes chat loads.", body_style), 
+            Paragraph("Wait times cut from 185s to 15s. Prevented <b>$3,200/day</b> in SLA penalties.", body_style)
         ],
         [
             Paragraph("<b>VIP Priority Routing</b>", body_style), 
-            Paragraph("Triggers voice trunk jitter troubleshooting and Tandem Care supervisor escalation checkpoints.", body_style), 
-            Paragraph("Escalated to L3 in 10s. Retained <b>$24,000 VIP contract ARR</b>; 100% CSAT.", body_style)
+            Paragraph("Scans SIP trunks via ACM server; identifies voice quality failures; prompts Tandem Care auth checkpoint.", body_style), 
+            Paragraph("Escalated VIP calls to L3 in 10s. Retained <b>$24,000 VIP account contract ARR</b>.", body_style)
         ],
         [
-            Paragraph("<b>Retention Discount ROI</b>", body_style), 
-            Paragraph("Searches SharePoint contract policy, computes retention discount guidelines, files records.", body_style), 
-            Paragraph("Applied $1,260 credit, saving <b>$8,400 contract value</b> (6.6x ROI relative to CAC).", body_style)
+            Paragraph("<b>Retention Discount Policy</b>", body_style), 
+            Paragraph("Queries SharePoint policy documents; applies SOP-Finance-204 coupons; inserts updated records.", body_style), 
+            Paragraph("Authorized $1,260 retention credit, saving <b>$8,400 contract value</b> (6.6x ROI relative to CAC).", body_style)
         ]
     ]
     
