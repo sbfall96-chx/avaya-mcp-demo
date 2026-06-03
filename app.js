@@ -1836,112 +1836,116 @@ async function runSimulatedToolLoop(presetKey, userText) {
       }
     }
   };
+  let scenario = null;
+    const queryLower = userText ? userText.toLowerCase() : "";
 
-  let scenario = presetConfig[presetKey];
-
-  if (!scenario && userText) {
-    const queryLower = userText.toLowerCase();
-    
-    // Scenario 1: Customer Interaction History & Activity Lookup
-    const foundCustomer = localDatabases.salesforce_crm.find(crm => {
+  // Check if we can find a customer in the query text first to prioritize Customer Lookup
+  let foundCustomer = null;
+  if (queryLower) {
+    foundCustomer = localDatabases.salesforce_crm.find(crm => {
       const nameParts = crm.name.toLowerCase().split(' ');
-      return queryLower.includes(crm.name.toLowerCase()) || (nameParts.length > 1 && nameParts[1].length > 2 && queryLower.includes(nameParts[1]));
+      // Check full name or last name
+      return queryLower.includes(crm.name.toLowerCase()) || 
+             (nameParts.length > 1 && nameParts[nameParts.length - 1].length > 2 && queryLower.includes(nameParts[nameParts.length - 1]));
     });
+  }
+
+  if (foundCustomer) {
+    const isTroubleshoot = queryLower.includes('troubleshoot') || queryLower.includes('jitter') || queryLower.includes('quality') || queryLower.includes('dropped') || queryLower.includes('issue') || queryLower.includes('policy') || queryLower.includes('sop') || queryLower.includes('ticket') || queryLower.includes('problem');
     
-    if (foundCustomer) {
-      const isTroubleshoot = queryLower.includes('troubleshoot') || queryLower.includes('jitter') || queryLower.includes('quality') || queryLower.includes('dropped') || queryLower.includes('issue') || queryLower.includes('policy') || queryLower.includes('sop') || queryLower.includes('ticket') || queryLower.includes('problem');
-      
-      if (isTroubleshoot) {
-        scenario = {
-          requiredServers: ['salesforce_crm', 'sharepoint_kb'],
-          steps: [
-            {
-              title: `Query CRM History: ${maskText(foundCustomer.name)}`,
-              tag: 'salesforce_crm/get_customer_interaction_history',
-              desc: `Fetch past contact records, active tickets, and conversation logs.`,
-              payload: { customer_name: maskText(foundCustomer.name) },
-              execute: () => mcpTools.get_customer_interaction_history({ customer_name: foundCustomer.name })
-            },
-            {
-              title: `Search SharePoint KB: "voice jitter"`,
-              tag: 'sharepoint_kb/sharepoint_kb_search',
-              desc: `Perform semantic scan on company SOP records for voice quality or jitter rules.`,
-              payload: { query: "jitter" },
-              execute: () => mcpTools.sharepoint_kb_search({ query: "jitter" })
-            }
-          ],
-          generate: () => {
-            const histRes = mcpTools.get_customer_interaction_history({ customer_name: foundCustomer.name });
-            const searchRes = mcpTools.sharepoint_kb_search({ query: "jitter" });
-            const policyText = searchRes.document_matches[0] ? searchRes.document_matches[0].text : "No policy found.";
-            const docTitle = searchRes.document_matches[0] ? searchRes.document_matches[0].title : "SOP-Support-101";
-
-            let html = `<p>I have successfully orchestrated a cross-server resolution using **Zendesk CRM** and **SharePoint Knowledge Base** via MCP tools.</p>`;
-            html += `<p>**1. Active Support Case Retrieved:**</p>`;
-            html += `<p style="padding-left: 10px; border-left: 2px solid var(--color-cyan); margin: 6px 0; color: var(--text-secondary); font-size: 0.85rem;">`;
-            html += `Active Ticket for **${maskText(foundCustomer.name)}**: <strong>${foundCustomer.ticket || 'None'}</strong><br>`;
-            html += `Email: <em>${foundCustomer.email}</em> | Account: <em>${foundCustomer.account}</em>`;
-            html += `</p>`;
-
-            html += `<p>**2. SharePoint SOP Guidelines Found:**</p>`;
-            html += `<div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; font-size: 0.85rem; line-height: 1.4; margin: 10px 0;">`;
-            html += `<strong style="color: var(--color-cyan); font-size: 0.75rem; text-transform: uppercase;">📄 ${docTitle}:</strong><br>`;
-            html += `"${policyText}"`;
-            html += `</div>`;
-
-            html += `<p>**3. AI Resolution Recommendation:**</p>`;
-            html += `<ul>`;
-            html += `<li>Initiate real-time line diagnostics on SIP trunk logs for **${maskText(foundCustomer.name)}**.</li>`;
-            html += `<li>According to **${docTitle}**, if SIP packet loss exceeds 1.0% or round-trip time is >150ms, reroute VoIP audio streams via alternative media gateways immediately.</li>`;
-            html += `</ul>`;
-            return html;
+    if (isTroubleshoot) {
+      scenario = {
+        requiredServers: ['salesforce_crm', 'sharepoint_kb'],
+        steps: [
+          {
+            title: `Query CRM History: ${maskText(foundCustomer.name)}`,
+            tag: 'salesforce_crm/get_customer_interaction_history',
+            desc: `Fetch past contact records, active tickets, and conversation logs.`,
+            payload: { customer_name: maskText(foundCustomer.name) },
+            execute: () => mcpTools.get_customer_interaction_history({ customer_name: foundCustomer.name })
           },
-          render: () => {}
-        };
-      } else {
-        scenario = {
-          requiredServers: ['salesforce_crm'],
-          steps: [
-            {
-              title: `Query Customer History: ${maskText(foundCustomer.name)}`,
-              tag: 'salesforce_crm/get_customer_interaction_history',
-              desc: `Fetch past contact records, tickets, and conversation logs for CRM account.`,
-              payload: { customer_name: maskText(foundCustomer.name) },
-              execute: () => mcpTools.get_customer_interaction_history({ customer_name: foundCustomer.name })
-            }
-          ],
-          generate: () => {
-            const histRes = mcpTools.get_customer_interaction_history({ customer_name: foundCustomer.name });
-            const interactions = histRes.interactions;
-            
-            if (!interactions || interactions.length === 0) {
-              return `<p>I queried the CRM history tool for **${maskText(foundCustomer.name)}** but found **no past interaction logs** associated with their profile.</p>`;
-            }
-            
-            let html = `<p>I resolved your query by calling tool <code>salesforce_crm/get_customer_interaction_history</code>. Here is the past contact center history for **${maskText(foundCustomer.name)}** (${foundCustomer.account}):</p>`;
-            html += `<div class="silo-table-container" style="max-height: 250px; border: 1px solid var(--border-color); border-radius: 6px; margin: 10px 0;">
-              <table class="silo-table">
-              <thead>
-                <tr><th>Date</th><th>Channel</th><th>Agent</th><th>Conversation Notes</th></tr>
-              </thead>
-              <tbody>`;
-            interactions.forEach(i => {
-              html += `<tr>
-                <td style="white-space: nowrap;">${i.date}</td>
-                <td><span style="color: ${i.channel === 'voice' ? 'var(--color-avaya-red)' : i.channel === 'chat' ? 'var(--color-cyan)' : 'var(--color-purple)'}">${i.channel}</span></td>
-                <td style="white-space: nowrap;">${i.agent}</td>
-                <td>${i.notes}</td>
-              </tr>`;
-            });
-            html += `</tbody></table></div>`;
-            return html;
-          },
-          render: () => {}
-        };
-      }
+          {
+            title: `Search SharePoint KB: "voice jitter"`,
+            tag: 'sharepoint_kb/sharepoint_kb_search',
+            desc: `Perform semantic scan on company SOP records for voice quality or jitter rules.`,
+            payload: { query: "jitter" },
+            execute: () => mcpTools.sharepoint_kb_search({ query: "jitter" })
+          }
+        ],
+        generate: () => {
+          const histRes = mcpTools.get_customer_interaction_history({ customer_name: foundCustomer.name });
+          const searchRes = mcpTools.sharepoint_kb_search({ query: "jitter" });
+          const policyText = searchRes.document_matches[0] ? searchRes.document_matches[0].text : "No policy found.";
+          const docTitle = searchRes.document_matches[0] ? searchRes.document_matches[0].title : "SOP-Support-101";
+
+          let html = `<p>I have successfully orchestrated a cross-server resolution using **Zendesk CRM** and **SharePoint Knowledge Base** via MCP tools.</p>`;
+          html += `<p>**1. Active Support Case Retrieved:**</p>`;
+          html += `<p style="padding-left: 10px; border-left: 2px solid var(--color-cyan); margin: 6px 0; color: var(--text-secondary); font-size: 0.85rem;">`;
+          html += `Active Ticket for **${maskText(foundCustomer.name)}**: <strong>${foundCustomer.ticket || 'None'}</strong><br>`;
+          html += `Email: <em>${foundCustomer.email}</em> | Account: <em>${foundCustomer.account}</em>`;
+          html += `</p>`;
+
+          html += `<p>**2. SharePoint SOP Guidelines Found:**</p>`;
+          html += `<div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; font-size: 0.85rem; line-height: 1.4; margin: 10px 0;">`;
+          html += `<strong style="color: var(--color-cyan); font-size: 0.75rem; text-transform: uppercase;">📄 ${docTitle}:</strong><br>`;
+          html += `"${policyText}"`;
+          html += `</div>`;
+
+          html += `<p>**3. AI Resolution Recommendation:**</p>`;
+          html += `<ul>`;
+          html += `<li>Initiate real-time line diagnostics on SIP trunk logs for **${maskText(foundCustomer.name)}**.</li>`;
+          html += `<li>According to **${docTitle}**, if SIP packet loss exceeds 1.0% or round-trip time is >150ms, reroute VoIP audio streams via alternative media gateways immediately.</li>`;
+          html += `</ul>`;
+          return html;
+        },
+        render: () => {}
+      };
+    } else {
+      scenario = {
+        requiredServers: ['salesforce_crm'],
+        steps: [
+          {
+            title: `Query Customer History: ${maskText(foundCustomer.name)}`,
+            tag: 'salesforce_crm/get_customer_interaction_history',
+            desc: `Fetch past contact records, tickets, and conversation logs for CRM account.`,
+            payload: { customer_name: maskText(foundCustomer.name) },
+            execute: () => mcpTools.get_customer_interaction_history({ customer_name: foundCustomer.name })
+          }
+        ],
+        generate: () => {
+          const histRes = mcpTools.get_customer_interaction_history({ customer_name: foundCustomer.name });
+          const interactions = histRes.interactions;
+          
+          if (!interactions || interactions.length === 0) {
+            return `<p>I queried the CRM history tool for **${maskText(foundCustomer.name)}** but found **no past interaction logs** associated with their profile.</p>`;
+          }
+          
+          let html = `<p>I resolved your query by calling tool <code>salesforce_crm/get_customer_interaction_history</code>. Here is the past contact center history for **${maskText(foundCustomer.name)}** (${foundCustomer.account}):</p>`;
+          html += `<div class="silo-table-container" style="max-height: 250px; border: 1px solid var(--border-color); border-radius: 6px; margin: 10px 0;">
+            <table class="silo-table">
+            <thead>
+              <tr><th>Date</th><th>Channel</th><th>Agent</th><th>Conversation Notes</th></tr>
+            </thead>
+            <tbody>`;
+          interactions.forEach(i => {
+            html += `<tr>
+              <td style="white-space: nowrap;">${i.date}</td>
+              <td><span style="color: ${i.channel === 'voice' ? 'var(--color-avaya-red)' : i.channel === 'chat' ? 'var(--color-cyan)' : 'var(--color-purple)'}">${i.channel}</span></td>
+              <td style="white-space: nowrap;">${i.agent}</td>
+              <td>${i.notes}</td>
+            </tr>`;
+          });
+          html += `</tbody></table></div>`;
+          return html;
+        },
+        render: () => {}
+      };
     }
-    
-    // Scenario 2: SharePoint Policy Search
+  } else if (presetKey) {
+    scenario = presetConfig[presetKey];
+  }
+
+  // Scenario 2: SharePoint Policy Search
     if (!scenario && (queryLower.includes('policy') || queryLower.includes('search') || queryLower.includes('kb') || queryLower.includes('warranty') || queryLower.includes('refund') || queryLower.includes('cancellation') || queryLower.includes('grace') || queryLower.includes('bypass') || queryLower.includes('mfa') || queryLower.includes('outage') || queryLower.includes('tax') || queryLower.includes('upgrade') || queryLower.includes('sla') || queryLower.includes('compliance'))) {
       let searchTerm = 'policy';
       const terms = ['refund', 'warranty', 'cancellation', 'grace', 'mfa', 'bypass', 'outage', 'tax', 'exemption', 'upgrade', 'downgrade', 'sla', 'compliance', 'jitter', 'load balance'];
@@ -2045,7 +2049,6 @@ async function runSimulatedToolLoop(presetKey, userText) {
         render: () => {}
       };
     }
-  }
 
   if (!scenario) {
     // Normal query with no matching scenario
