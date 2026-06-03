@@ -41,8 +41,9 @@ The UI is divided into four main tabs, each designed to demonstrate a different 
 To support sales meetings and interview panels, I have compiled professional documentation directly in the workspace:
 
 1. **[Avaya_Infinity_MCP_Pitch_Deck.pptx](file:///c:/Users/sbfal/OneDrive/Desktop/work/Avaya_Infinity_MCP_Pitch_Deck.pptx)**: A premium 8-slide PowerPoint presentation covering the project origin, what the app shows, alignment with Avaya's roadmap, deep-dives into Lakehouses & Security, and business outcomes.
-2. **[Avaya_Infinity_MCP_Executive_Brief.pdf](file:///c:/Users/sbfal/OneDrive/Desktop/work/Avaya_Infinity_MCP_Executive_Brief.pdf)**: A print-readySolutions Brief PDF outlining executive summaries, cost comparison tables, and scenario ROI calculations.
-3. **[make_pitch_assets.py](file:///c:/Users/sbfal/OneDrive/Desktop/work/make_pitch_assets.py)**: The underlying Python compilation script that dynamically generates the presentation slides and PDF brief.
+2. **[Avaya_Infinity_MCP_Pitch_Deck.pdf](file:///c:/Users/sbfal/OneDrive/Desktop/work/Avaya_Infinity_MCP_Pitch_Deck.pdf)**: A PDF copy of the 8-slide presentation deck formatted in landscape style for easy distribution and sharing.
+3. **[Avaya_Infinity_MCP_Executive_Brief.pdf](file:///c:/Users/sbfal/OneDrive/Desktop/work/Avaya_Infinity_MCP_Executive_Brief.pdf)**: A print-ready Solutions Brief PDF outlining executive summaries, cost comparison tables, and scenario ROI calculations.
+4. **[make_pitch_assets.py](file:///c:/Users/sbfal/OneDrive/Desktop/work/make_pitch_assets.py)**: The underlying Python compilation script that dynamically generates the presentation slides and PDF brief.
 
 ---
 
