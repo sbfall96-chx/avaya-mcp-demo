@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", function() {
   const agentVal = document.getElementById("agent-val");
   const spendSlider = document.getElementById("spend-slider");
   const spendVal = document.getElementById("spend-val");
+  const pocComplexity = document.getElementById("poc-complexity");
   
   const capMcp = document.getElementById("cap-mcp");
   const capAgent = document.getElementById("cap-agent");
@@ -20,6 +21,8 @@ document.addEventListener("DOMContentLoaded", function() {
   const kpiSavingsPercent = document.getElementById("kpi-savings-percentage");
   const kpiTimeline = document.getElementById("kpi-timeline");
   const kpiTimelineComp = document.getElementById("kpi-timeline-comparison");
+  const kpiPoc = document.getElementById("kpi-poc");
+  const kpiPocComp = document.getElementById("kpi-poc-comparison");
   const kpiRisk = document.getElementById("kpi-risk");
   const kpiRiskDetail = document.getElementById("kpi-risk-detail");
 
@@ -53,7 +56,7 @@ document.addEventListener("DOMContentLoaded", function() {
   bindCardState(capLogging, capCardLogging);
   bindCardState(capGov, capCardGov);
 
-  // Slider Display Sync
+  // Slider & Dropdown Sync
   agentSlider.addEventListener("input", () => {
     agentVal.textContent = Number(agentSlider.value).toLocaleString();
     calculateROI();
@@ -63,6 +66,7 @@ document.addEventListener("DOMContentLoaded", function() {
     calculateROI();
   });
   footprintSelect.addEventListener("change", calculateROI);
+  pocComplexity.addEventListener("change", calculateROI);
 
   // 2. Initialize ChartJS
   // Chart 1: One-Time Capex TCO comparison
@@ -75,8 +79,8 @@ document.addEventListener("DOMContentLoaded", function() {
         label: 'Implementation & License Capex ($)',
         data: [0, 0],
         backgroundColor: [
-          'rgba(218, 41, 28, 0.75)',  // Avaya Red for traditional/migration
-          'rgba(0, 240, 255, 0.75)'   // Cyan for Infinity
+          'rgba(218, 41, 28, 0.75)',  // Avaya Red
+          'rgba(0, 240, 255, 0.75)'   // Cyan
         ],
         borderColor: [
           '#DA291C',
@@ -157,10 +161,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // 3. Core ROI Calculation & Rendering Logic
   function calculateROI() {
-    // Read input values
     const footprint = footprintSelect.value;
     const agents = parseInt(agentSlider.value);
     const annualSpend = parseInt(spendSlider.value);
+    const complexity = pocComplexity.value;
     
     const hasMcp = capMcp.checked;
     const hasAgent = capAgent.checked;
@@ -168,42 +172,49 @@ document.addEventListener("DOMContentLoaded", function() {
     const hasGov = capGov.checked;
 
     // A. TRADITIONAL CLOUD MIGRATION COST (e.g. Genesys/NICE rip-and-replace)
-    // - Setup/custom wrappers: Base $90k + Sizing premium
-    // - Consulting & configuration: $180 per agent
-    // - Licensing: Sizing * $150/month * 12
     const migrationSetup = 90000 + (agents * 40);
     const migrationConsulting = agents * 220;
     const migrationLicensingAnnual = agents * 160 * 12;
 
     const migrationYear1 = migrationSetup + migrationConsulting + migrationLicensingAnnual;
-    const migrationYear2 = migrationYear1 + migrationLicensingAnnual + (migrationSetup * 0.15); // Add maintenance
+    const migrationYear2 = migrationYear1 + migrationLicensingAnnual + (migrationSetup * 0.15);
     const migrationYear3 = migrationYear2 + migrationLicensingAnnual + (migrationSetup * 0.15);
 
     // B. AVAYA INFINITY OVERLAY COST
-    // - Base Platform: $20,000
-    // - Setup (Unified bus, zero custom wrappers): Base $12,000 + Sizing $10/agent
-    // - Overlay Consulting: $8,000
-    // - Subscription (BYOAI Infinity seat): Sizing * $30/month * 12
     const infinitySetup = 12000 + (agents * 10);
     const infinityPlatformBase = 20000;
     const infinityConsulting = 8000;
     const infinityLicensingAnnual = agents * 30 * 12;
 
-    // Overlay allows customer to retire their current support spend
-    // We count the opex savings as a deduction against the net cost of the overlay
     const retiredOpexAnnual = annualSpend;
 
     const infinityYear1 = infinityPlatformBase + infinitySetup + infinityConsulting + infinityLicensingAnnual;
     const infinityYear2 = infinityYear1 + infinityLicensingAnnual + infinityPlatformBase;
     const infinityYear3 = infinityYear2 + infinityLicensingAnnual + infinityPlatformBase;
 
-    // Net 3-Year totals
     const total3YearMigration = migrationYear3;
-    const total3YearInfinity = infinityYear3 - (retiredOpexAnnual * 3); // Deduct retired opex
+    const total3YearInfinity = infinityYear3 - (retiredOpexAnnual * 3);
     
-    // Net 3-Year savings (floored at 20k to avoid weird slider combos)
     const net3YearSavings = Math.max(20000, total3YearMigration - total3YearInfinity);
     const savingsPercentage = Math.round((net3YearSavings / total3YearMigration) * 100);
+
+    // C. PRE-SALES / POC ESTIMATION
+    let competitorPocDays = 14;
+    let competitorPocLaborHours = 40;
+    if (complexity === "simple") {
+      competitorPocDays = 10;
+      competitorPocLaborHours = 24;
+    } else if (complexity === "complex") {
+      competitorPocDays = 35;
+      competitorPocLaborHours = 120;
+    }
+    
+    // Avaya is always 4 hours because of zero-code metadata mapping
+    const avayaPocHours = 4;
+    const scHourlyRate = 150; // standard pre-sales consulting cost representation
+    const competitorScCost = competitorPocLaborHours * scHourlyRate;
+    const avayaScCost = avayaPocHours * scHourlyRate;
+    const scLaborSavings = Math.max(0, competitorScCost - avayaScCost);
 
     // Timeline Sizing
     let timelineDays = 180;
@@ -224,6 +235,9 @@ document.addEventListener("DOMContentLoaded", function() {
     
     kpiTimeline.textContent = "2 Hours";
     kpiTimelineComp.textContent = `vs. ${timelineDays}-day cloud migration`;
+
+    kpiPoc.textContent = "4 Hours";
+    kpiPocComp.textContent = `vs. ${competitorPocDays} days for custom PoC`;
     
     kpiRisk.textContent = riskLevel;
     kpiRiskDetail.textContent = riskDetail;
@@ -268,6 +282,14 @@ document.addEventListener("DOMContentLoaded", function() {
       <ul class="list-view-des" style="margin-left: 20px; list-style-type: disc; padding-left: 10px; font-size: 0.85rem; display: flex; flex-direction: column; gap: 6px;">
         ${capBullets || "<li>No upgrade capabilities currently selected.</li>"}
       </ul>
+
+      <h3>Technical Validation & PoC Acceleration</h3>
+      <p>
+        Because Avaya Infinity utilizes standardized Model Context Protocol (MCP) data schemas, our Solutions Consulting team can deliver a custom, 
+        fully integrated Proof-of-Concept (PoC) in <strong>4 hours</strong> rather than the standard <strong>${competitorPocDays} days</strong> required for custom competitor API integrations. 
+        This reduces your team's evaluation cycle by over 3 weeks, saves <strong>$${Math.round(scLaborSavings).toLocaleString()}</strong> in pre-sales engineering labor, 
+        and establishes immediate operational feasibility.
+      </p>
 
       <h3>Financial Summary (3-Year TCO Comparison)</h3>
       <table class="memo-table">

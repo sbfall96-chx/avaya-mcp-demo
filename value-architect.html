@@ -80,6 +80,20 @@
       </div>
 
       <div>
+        <h2 class="section-title">Pre-Sales Validation (PoC)</h2>
+        <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 6px 0 12px 0;">Model the timeline and resource cost of the technical validation phase:</p>
+        
+        <div class="form-group">
+          <label for="poc-complexity" class="form-label">Data Silo Integration Complexity</label>
+          <select class="form-select" id="poc-complexity">
+            <option value="simple">1 Silo (CRM Only - Simple)</option>
+            <option value="standard" selected>2-3 Silos (CRM + SQL + KB - Standard)</option>
+            <option value="complex">4+ Silos (Legacy Mainframes + Custom - Complex)</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
         <h2 class="section-title">Target Upgrade Capabilities</h2>
         <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 6px 0 12px 0;">Select capabilities to overlay via Avaya Infinity MCP standard bus:</p>
         
@@ -122,7 +136,7 @@
     <!-- Right Column: Dashboard & Value Output -->
     <section class="dashboard-panel">
       
-      <!-- KPI Metric Cards -->
+      <!-- KPI Metric Cards (Expanded to 4-card row) -->
       <div class="kpi-grid">
         <div class="kpi-card savings">
           <span class="kpi-label">Total 3-Year TCO Savings</span>
@@ -133,6 +147,12 @@
           <span class="kpi-label">Modernization Timeline</span>
           <span class="kpi-value cyan" id="kpi-timeline">2 Hours</span>
           <span class="kpi-detail" id="kpi-timeline-comparison">vs. 180-day cloud migration</span>
+        </div>
+        <div class="kpi-card savings" style="position: relative;">
+          <span class="kpi-label">PoC Setup (Time-to-Proof)</span>
+          <span class="kpi-value cyan" style="color: var(--color-cyan);" id="kpi-poc">4 Hours</span>
+          <span class="kpi-detail" id="kpi-poc-comparison">vs. 21 days for custom coding</span>
+          <div style="position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--color-cyan);"></div>
         </div>
         <div class="kpi-card risk">
           <span class="kpi-label">Implementation Risk Index</span>
