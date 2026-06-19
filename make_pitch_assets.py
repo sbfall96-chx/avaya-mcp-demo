@@ -92,7 +92,7 @@ def generate_pptx():
     p4.space_before = Pt(40)
 
     p5 = tf.add_paragraph()
-    p5.text = "Savannah, GA  |  678-481-5135  |  sbfall96@gmail.com  |  linkedin.com/in/sbfall96  |  github.com/sbfall96-chx/avaya-mcp-demo"
+    p5.text = "Savannah, GA  |  470-313-0805  |  sbfall96@gmail.com  |  linkedin.com/in/sbfall96  |  github.com/sbfall96-chx/avaya-mcp-demo"
     p5.font.size = Pt(11)
     p5.font.color.rgb = TEXT_MUTED
     p5.font.name = "Outfit"

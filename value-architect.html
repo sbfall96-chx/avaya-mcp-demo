@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Avaya Infinity Value Architect – TCO & ROI Modernization Estimator</title>
+  <meta name="description" content="Calculate TCO savings, migration risks, and implementation ROI when modernizing legacy telephony systems with the Avaya Infinity MCP overlay.">
+  <link rel="stylesheet" href="value-style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <!-- App Header -->
+  <header class="app-header">
+    <div class="brand-section">
+      <!-- Avaya-themed inline SVG logo -->
+      <svg class="brand-logo" viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg" style="overflow: visible;">
+        <path d="M2,35 L12,7 L22,35" stroke="var(--color-avaya-red)" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M26,7 L36,35 L46,7" stroke="var(--color-avaya-red)" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M50,35 L60,7 L70,35" stroke="var(--color-avaya-red)" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M74,7 L84,20 L94,7 M84,20 L84,35" stroke="var(--color-avaya-red)" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M98,35 L108,7 L118,35" stroke="var(--color-avaya-red)" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      <h1 class="brand-title">
+        INFINITY VALUE ARCHITECT
+        <span style="font-weight: 300; font-size: 0.7em; color: var(--color-cyan); border: 1px solid rgba(0,240,255,0.3); padding: 2px 6px; border-radius: 4px; letter-spacing: 1px;">ROI ESTIMATOR</span>
+      </h1>
+    </div>
+    <div>
+      <a href="index.html" class="back-to-console">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back to Console
+      </a>
+    </div>
+  </header>
+
+  <!-- Split Grid Layout -->
+  <main class="main-layout">
+    
+    <!-- Left Column: Estimator Controls -->
+    <aside class="glass-panel">
+      <div>
+        <h2 class="section-title">Current Footprint</h2>
+        
+        <div class="form-group" style="margin-top: 12px;">
+          <label for="footprint-select" class="form-label">Active Telephony Core</label>
+          <select class="form-select" id="footprint-select">
+            <option value="aura-onprem" selected>Avaya Aura / Elite (On-Premises)</option>
+            <option value="cc-hybrid">Avaya Contact Center (Hybrid)</option>
+            <option value="axp-legacy">Avaya Experience Platform (Legacy Cloud)</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <h2 class="section-title">Operational Scale</h2>
+        
+        <div class="form-group" style="margin-top: 12px;">
+          <label class="form-label">
+            <span>Contact Center Size</span>
+            <span><span class="slider-val" id="agent-val">1,000</span> Agents</span>
+          </label>
+          <div class="slider-container">
+            <input type="range" class="range-slider" id="agent-slider" min="100" max="15000" step="100" value="1000">
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 12px;">
+          <label class="form-label">
+            <span>Annual Support & Maintenance Spend</span>
+            <span>$<span class="slider-val" id="spend-val">150,000</span>/yr</span>
+          </label>
+          <div class="slider-container">
+            <input type="range" class="range-slider" id="spend-slider" min="20000" max="1000000" step="10000" value="150000">
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h2 class="section-title">Target Upgrade Capabilities</h2>
+        <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 6px 0 12px 0;">Select capabilities to overlay via Avaya Infinity MCP standard bus:</p>
+        
+        <div class="capability-cards">
+          <label class="capability-card active" id="cap-card-mcp">
+            <input type="checkbox" class="cap-checkbox" id="cap-mcp" checked>
+            <div class="cap-info">
+              <span class="cap-title">Omnichannel Orchestration (MCP)</span>
+              <span class="cap-desc">Standardized broker connecting CRM, databases, and AI.</span>
+            </div>
+          </label>
+
+          <label class="capability-card active" id="cap-card-agent">
+            <input type="checkbox" class="cap-checkbox" id="cap-agent" checked>
+            <div class="cap-info">
+              <span class="cap-title">Real-Time Agent Assist</span>
+              <span class="cap-desc">LLM-powered prompt suggestions and summarization.</span>
+            </div>
+          </label>
+
+          <label class="capability-card" id="cap-card-logging">
+            <input type="checkbox" class="cap-checkbox" id="cap-logging">
+            <div class="cap-info">
+              <span class="cap-title">Automated CRM Ticket Logs</span>
+              <span class="cap-desc">Eliminate manual wrap-up times and summaries.</span>
+            </div>
+          </label>
+
+          <label class="capability-card" id="cap-card-gov">
+            <input type="checkbox" class="cap-checkbox" id="cap-gov">
+            <div class="cap-info">
+              <span class="cap-title">Zero-Trust Data Governance</span>
+              <span class="cap-desc">PII and HIPAA data masking at the gateway proxy layer.</span>
+            </div>
+          </label>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Right Column: Dashboard & Value Output -->
+    <section class="dashboard-panel">
+      
+      <!-- KPI Metric Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card savings">
+          <span class="kpi-label">Total 3-Year TCO Savings</span>
+          <span class="kpi-value green" id="kpi-savings">$0</span>
+          <span class="kpi-detail" id="kpi-savings-percentage">0% lower integration costs</span>
+        </div>
+        <div class="kpi-card timeline">
+          <span class="kpi-label">Modernization Timeline</span>
+          <span class="kpi-value cyan" id="kpi-timeline">2 Hours</span>
+          <span class="kpi-detail" id="kpi-timeline-comparison">vs. 180-day cloud migration</span>
+        </div>
+        <div class="kpi-card risk">
+          <span class="kpi-label">Implementation Risk Index</span>
+          <span class="kpi-value yellow" id="kpi-risk">Low Risk</span>
+          <span class="kpi-detail" id="kpi-risk-detail">Zero voice downtime, hybrid overlay</span>
+        </div>
+      </div>
+
+      <!-- Charts Section -->
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3 class="chart-title">Integration & Modernization TCO ($)</h3>
+            <span style="font-size: 0.75rem; color: var(--text-secondary);">One-Time Capex</span>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="tcoChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3 class="chart-title">Cumulative Cost Trend Over 3 Years ($)</h3>
+            <span style="font-size: 0.75rem; color: var(--text-secondary);">Overlay vs. Rip-and-Replace</span>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="trendChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Executive Value Brief Section -->
+      <div class="brief-panel">
+        <div class="brief-header">
+          <h3 class="brief-title">Executive Value Brief</h3>
+          <div class="brief-actions">
+            <button class="action-btn" id="print-brief-btn">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                <rect x="6" y="14" width="12" height="8"></rect>
+              </svg>
+              Print Brief
+            </button>
+          </div>
+        </div>
+
+        <!-- Print-styled business memo -->
+        <div class="memo-container" id="memo-container">
+          <div class="memo-header">
+            <div class="memo-title-main">AVAYA INFINITY EXECUTIVE BRIEF</div>
+            <div class="memo-row">
+              <span class="memo-label">TO:</span>
+              <span id="memo-to">Executive Leadership & Strategic Stakeholders</span>
+            </div>
+            <div class="memo-row">
+              <span class="memo-label">FROM:</span>
+              <span id="memo-from">Solutions Engineering & Value Architecture Team</span>
+            </div>
+            <div class="memo-row">
+              <span class="memo-label">DATE:</span>
+              <span id="memo-date">June 19, 2026</span>
+            </div>
+            <div class="memo-row">
+              <span class="memo-label">SUBJECT:</span>
+              <span>Financial & Operational Business Case: Avaya Infinity Overlay Upgrade</span>
+            </div>
+          </div>
+
+          <div class="memo-body" id="memo-body-content">
+            <!-- Dynamic content injected by value-app.js -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- App Footer -->
+  <footer class="app-footer">
+    <p>Powered by Avaya Infinity MCP & Databricks Unity Catalog. Confidential customer-facing pre-sales asset. &copy; 2026 Avaya Inc. All rights reserved.</p>
+  </footer>
+
+  <!-- App script logic -->
+  <script src="value-app.js"></script>
+</body>
+</html>
